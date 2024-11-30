@@ -20,13 +20,14 @@ class StudentFactory extends Factory
         $randomNumber = $currentYear. $this->faker->numerify('######');
         return [
             'student_number' => $randomNumber,
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'middle_name' => $this->faker->lastName(),
+            'first_name' => strtoupper($this->faker->firstName()),
+            'last_name' => strtoupper($this->faker->lastName()),
+            'middle_name' => strtoupper($this->faker->lastName()),
             'gender' => $this->faker->randomElement(['MALE', 'FEMALE']),
             'date_of_birth' => $this->faker->date(),
             'address' => $this->faker->address(),
-            'contact_number' => $this->faker->phoneNumber(),
+            //Philippine Number Regex
+            'contact_number' => $this->faker->regexify('^(09|\+639)\d{9}$'),
             'email' => $this->faker->unique()->safeEmail(),
         ];
     }
