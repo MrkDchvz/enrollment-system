@@ -22,7 +22,8 @@ class InstructorFactory extends Factory
             'department_id' => $department->id,
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'contact' => $this->faker->phoneNumber(),
+            //Philippine Number Regex
+            'contact_number' => $this->faker->regexify('^(09|\+639)\d{9}$'),
         ];
     }
 }

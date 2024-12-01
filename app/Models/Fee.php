@@ -12,4 +12,7 @@ class Fee extends Model
     public function enrollment () : BelongsToMany {
         return $this->belongsToMany(Enrollment::class);
     }
+
+
+
 }

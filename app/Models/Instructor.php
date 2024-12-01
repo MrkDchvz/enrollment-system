@@ -16,7 +16,7 @@ class Instructor extends Model
         'name',
         'department_id',
         'email',
-        'contact',
+        'contact_number',
     ];
 
     public function department() : BelongsTo {

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('contact')->unique();
+            $table->string('contact_number')->unique();
             $table->timestamps();
         });
     }

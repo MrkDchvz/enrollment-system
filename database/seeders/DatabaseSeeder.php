@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Enrollment;
+use App\Models\Instructor;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -27,8 +28,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentSeeder::class,
             FeeSeeder::class,
+            CourseSeeder::class,
         ]);
 
         Enrollment::factory(10)->create();
+        Instructor::factory(10)->create();
     }
 }

@@ -21,7 +21,8 @@ class Enrollment extends Model
         'year_level',
         'semester',
         'school_year',
-        'enrollment_date'
+        'enrollment_date',
+        'scholarship'
     ];
 
     public function student(): BelongsTo {
