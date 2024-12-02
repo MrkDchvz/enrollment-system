@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('scholarship')->nullable();
             $table->string('school_year');
             $table->date('enrollment_date');
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -33,6 +33,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('enrollments', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('enrollments');
+
     }
 };

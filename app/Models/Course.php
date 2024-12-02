@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
@@ -22,5 +23,9 @@ class Course extends Model
 
     public function schedules(): HasMany {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function students(): belongsToMany {
+        return $this->belongsToMany(Student::class)->with(['grade']);
     }
 }

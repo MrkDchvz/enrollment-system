@@ -19,7 +19,10 @@ class InstructorResource extends Resource
 {
     protected static ?string $model = Instructor::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static ?string $navigationIcon = 'heroicon-o-identification';
+
 
     public static function form(Form $form): Form
     {

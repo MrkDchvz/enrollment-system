@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('gender', ['MALE', 'FEMALE']);
             $table->date('date_of_birth');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -31,6 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('students', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('students');
+
     }
 };

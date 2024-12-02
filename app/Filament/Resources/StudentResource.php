@@ -2,12 +2,18 @@
 
 namespace App\Filament\Resources;
 
+//Plugin
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
+use App\Models\Course;
 use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -24,16 +30,26 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
+
+    protected static ?string $recordTitleAttribute = 'student_number';
+
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(static::getDetailsFormSchema());
+            ->schema([
+                Forms\Components\Section::make()
+                    ->schema(static::getDetailsFormSchema()),
+                Forms\Components\Section::make('Student Checklist')
+                    ->schema([static::getItemsRepeater()])
+               ]);
     }
 
     /**
@@ -44,6 +60,7 @@ class StudentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('student_number')
+
                     ->searchable(isIndividual: true),
                 TextColumn::make('full_name')
                     ->label('Full Name')
@@ -112,12 +129,14 @@ class StudentResource extends Resource
             ->actions([
 
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
                 Tables\Actions\EditAction::make(),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ForceDeleteBulkAction::make(),
+                Tables\Actions\RestoreBulkAction::make(),
             ]);
     }
 
@@ -173,6 +192,7 @@ class StudentResource extends Resource
             Forms\Components\TextInput::make('student_number')
                 ->default(fn() => Student::class::generateUniqueStudentNumber())
                 ->readonly()
+                ->hiddenOn('edit')
                 ->disabled()
                 ->dehydrated()
                 ->required()
@@ -213,5 +233,65 @@ class StudentResource extends Resource
                 ->email()
                 ->required(),
         ];
+    }
+
+    public static function getItemsRepeater(): TableRepeater {
+        return TableRepeater::make('courseStudents')
+            ->headers([
+                Header::make('Course Code')
+                    ->markAsRequired(),
+                Header::make('Grade')
+                    ->markAsRequired(),
+                Header::make('Course Name'),
+            ])
+            ->streamlined()
+//            Auto detect relationships of the CourseStudent model I guess?
+            ->relationship()
+            ->schema([
+                Forms\Components\Select::make('course_id')
+                    ->relationship('course', 'course_code')
+                    ->required()
+                    ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('course_name', \App\Models\Course::find($state)?->course_name ?? ''))
+                    ->reactive()
+                    ->searchable()
+                    ->columnSpan([
+                        'md' => 2,
+                    ]),
+                Forms\Components\Select::make('grade')
+                    ->options([
+                        '1.00' => '1.00',
+                        '1.25' => '1.25',
+                        '1.50' => '1.50',
+                        '1.75' => '1.75',
+                        '2.00' => '2.00',
+                        '2.25' => '2.25',
+                        '2.50' => '2.50',
+                        '2.75' => '2.75',
+                        '3.00' => '3.00',
+                        '4.00' => '4.00',
+                        '5.00' => '5.00',
+                        'INC' => 'INC',
+                        'DRP' => 'DRP',
+                    ])
+                    ->searchable()
+                    ->required()
+                    ->columnSpan([
+                        'md' => 2,
+                    ]),
+                Forms\Components\TextInput::make('course_name')
+                    ->label('Course Name')
+                    ->disabled()
+                    ->dehydrated()
+                    ->required()
+                    ->columnSpan([
+                        'md' => 6,
+                    ])
+            ])
+            ->columns([
+                'md' => 10,
+            ])
+            ->addActionLabel('Add grade')
+            ->hiddenLabel()
+            ->defaultItems(0);
     }
 }
