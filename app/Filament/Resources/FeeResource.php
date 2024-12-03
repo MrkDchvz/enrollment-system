@@ -18,6 +18,8 @@ class FeeResource extends Resource
 {
     protected static ?string $model = Fee::class;
 
+    protected static ?string $navigationGroup = 'Financial Management';
+
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     public static function form(Form $form): Form

@@ -38,6 +38,8 @@ class StudentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'student_number';
 
+    protected static ?string $navigationGroup = 'Student Management';
+
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
