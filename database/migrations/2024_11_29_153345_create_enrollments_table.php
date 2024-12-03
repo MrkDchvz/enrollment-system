@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('scholarship')->nullable();
             $table->string('school_year');
             $table->date('enrollment_date');
+            $table->enum('class_number', [1,2,3,4,5,6,7]);
             $table->timestamps();
             $table->softDeletes();
         });
