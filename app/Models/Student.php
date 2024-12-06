@@ -47,6 +47,11 @@ class Student extends Model
         return $studentNumber;
     }
 
+
+
+
+
+
     public function assignRole(string $string)
     {
     }
@@ -60,6 +65,19 @@ class Student extends Model
                 "{$attributes['last_name']}"
             ),
     );
+    }
+
+    public function email() : attribute {
+        return Attribute::make(
+            get: fn () => $this->user->email,
+            set: fn ($value) => $this->user->update(['email' => $value]),
+        );
+    }
+
+    public function grades() : attribute {
+        return Attribute::get(
+            fn () => $this->courses->pluck('grade', 'course_code')->toArray()
+        );
     }
 
     public function user () : BelongsTo {

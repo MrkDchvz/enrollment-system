@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 //Plugin
+use App\Models\Instructor;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 
@@ -18,9 +19,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
+use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
@@ -29,7 +32,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use Illuminate\Support\Facades\Log;
 
 
 class StudentResource extends Resource
@@ -54,6 +57,8 @@ class StudentResource extends Resource
                     ->hiddenOn('create')
                ]);
     }
+
+
 
     /**
      * @throws \Exception
@@ -130,7 +135,6 @@ class StudentResource extends Resource
                     })
             ])
             ->actions([
-
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
@@ -142,6 +146,8 @@ class StudentResource extends Resource
                 Tables\Actions\RestoreBulkAction::make(),
             ]);
     }
+
+
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -166,7 +172,16 @@ class StudentResource extends Resource
                         ->dateTime(),
                     TextEntry::make('updated_at')
                         ->dateTime()
-                ])
+                ]),
+                Fieldset::make('Checklist')->schema([
+                    KeyValueEntry::make('grades')
+                        ->label('')
+                        ->keyLabel('Course')
+                        ->valueLabel('Grade')
+                        ->alignment(Alignment::Center),
+
+                ]),
+
             ]);
     }
 
@@ -183,6 +198,7 @@ class StudentResource extends Resource
             'index' => Pages\ListStudents::route('/'),
             'create' => Pages\CreateStudent::route('/create'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
+            'view' => Pages\ViewStudent::route('/{record}'),
         ];
     }
 
@@ -195,7 +211,6 @@ class StudentResource extends Resource
             Forms\Components\TextInput::make('student_number')
                 ->default(fn() => Student::class::generateUniqueStudentNumber())
                 ->readonly()
-                ->hiddenOn('edit')
                 ->disabled()
                 ->dehydrated()
                 ->required()
@@ -243,16 +258,19 @@ class StudentResource extends Resource
             ->headers([
                 Header::make('Course Code')
                     ->markAsRequired(),
-                Header::make('Grade')
-                    ->markAsRequired(),
                 Header::make('Course Name'),
+                Header::make('grade')
+                    ->markAsRequired(),
+                Header::make('Instructor')
+                    ->markAsRequired(),
             ])
             ->streamlined()
 //            Auto detect relationships of the CourseStudent model I guess?
             ->relationship()
             ->schema([
                 Forms\Components\Select::make('course_id')
-                    ->relationship('course', 'course_code')
+                    ->label('Course')
+                    ->options(Course::all()->pluck('course_code', 'id'))
                     ->required()
                     ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('course_name', \App\Models\Course::find($state)?->course_name ?? ''))
                     ->reactive()
@@ -260,6 +278,15 @@ class StudentResource extends Resource
                     ->columnSpan([
                         'md' => 2,
                     ]),
+                Forms\Components\TextInput::make('course_name')
+                    ->label('Course Name')
+                    ->disabled()
+                    ->dehydrated()
+                    ->required()
+                    ->columnSpan([
+                        'md' => 6,
+                    ]),
+
                 Forms\Components\Select::make('grade')
                     ->options([
                         '1.00' => '1.00',
@@ -281,14 +308,12 @@ class StudentResource extends Resource
                     ->columnSpan([
                         'md' => 2,
                     ]),
-                Forms\Components\TextInput::make('course_name')
-                    ->label('Course Name')
-                    ->disabled()
-                    ->dehydrated()
+                Forms\Components\Select::make('instructor_id')
+                    ->options(Instructor::all()->pluck('name', 'id'))
+                    ->searchable()
                     ->required()
-                    ->columnSpan([
-                        'md' => 6,
-                    ])
+                    ->native(false)
+
             ])
             ->columns([
                 'md' => 10,
@@ -298,10 +323,5 @@ class StudentResource extends Resource
             ->defaultItems(0);
     }
 
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['user_id'] = auth()->id();
 
-        return $data;
-    }
 }
