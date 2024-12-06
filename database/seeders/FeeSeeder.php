@@ -15,10 +15,10 @@ class FeeSeeder extends Seeder
     {
         DB::table('fees')->insert([
             ['name' => "Com.Lab", 'amount' => 800.0],
-            ['name' => "NSTP", 'amount' => 0],
+            ['name' => "NSTP", 'amount' => 20],
             ['name' => "Com.Lab", 'amount' => 55.00],
-            ['name' => "ID", 'amount' => 0],
-            ['name' => "Late Reg.", 'amount' => 0],
+            ['name' => "ID", 'amount' => 30],
+            ['name' => "Late Reg.", 'amount' => 40],
             ['name' => "Insurance", 'amount' => 25.00],
             ['name' => "Tution Fee", 'amount' => 3200.00],
             ['name' => "SFDF", 'amount' => 1500.00],

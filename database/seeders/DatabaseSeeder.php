@@ -4,10 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Enrollment;
 use App\Models\Instructor;
+use App\Models\Student;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Factories\StudentFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,20 +22,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-
-        User::factory()->create([
+        // Create an Admin Account
+        $admin = User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin')
         ]);
 
+
         $this->call([
             DepartmentSeeder::class,
+            SectionSeeder::class,
             FeeSeeder::class,
             CourseSeeder::class,
+            StudentUserSeeder::class,
         ]);
 
-        Enrollment::factory(10)->create();
-        Instructor::factory(10)->create();
+        Instructor::factory()->count(10)->create();
+
+
+        $role = Role::create(['name' => 'Admin']);
+        $admin->assignRole('Admin');
+//        $permission = Permission::create(['name' => 'add student']);
     }
 }

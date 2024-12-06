@@ -18,6 +18,7 @@ class Enrollment extends Model
         'user_id',
         'department_id',
         'student_id',
+        'section_id',
         'registration_status',
         'old_new_student',
         'year_level',
@@ -42,7 +43,12 @@ class Enrollment extends Model
     public function fees () : BelongsToMany {
         return $this->belongsToMany(Fee::class);
     }
-    public function schedule() : BelongsToMany {
-        return $this->belongsToMany(Schedule::class);
+
+    public function section () : BelongsTo {
+        return $this->belongsTo(Section::class);
+    }
+
+    public function courses() : BelongsToMany {
+        return $this->belongsToMany(Course::class);
     }
 }

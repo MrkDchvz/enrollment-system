@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Dom\Attr;
+
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,6 +29,7 @@ class Student extends Model
         'email',
         'gender',
         'date_of_birth',
+        'user_id'
     ];
 
 
@@ -45,6 +47,10 @@ class Student extends Model
         return $studentNumber;
     }
 
+    public function assignRole(string $string)
+    {
+    }
+
     protected function fullName() : Attribute
     {
         return Attribute::make(
@@ -56,7 +62,9 @@ class Student extends Model
     );
     }
 
-
+    public function user () : BelongsTo {
+        return $this->belongsTo(User::class);
+    }
 
     public function enrollments(): HasMany {
         return $this->hasMany(Enrollment::class);

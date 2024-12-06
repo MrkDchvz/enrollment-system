@@ -20,6 +20,7 @@ class EnrollmentFactory extends Factory
     public function definition(): array
     {
         $department = DB::table('departments')->inRandomOrder()->first();
+        $section = DB::table('sections')->inRandomOrder()->first();
         $user = DB::table('users')->inRandomOrder()->first();
 //        Carbon is a dateTime Library built in laravel
 //        now() = gets the current date, ->year =  gets the year from a date
@@ -33,6 +34,7 @@ class EnrollmentFactory extends Factory
             },
             'department_id' => $department->id,
             'user_id' =>  $user->id,
+            'section_id' => $section->id,
             'scholarship' => $scholarship,
             'registration_status' => $this->faker->randomElement(['REGULAR', 'IRREGULAR']),
             'semester' => $this->faker->randomElement(['1st Semester', '2nd Semester']),

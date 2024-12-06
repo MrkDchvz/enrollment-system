@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('student_number')->unique();
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('middle_name')->nullable();
             $table->string('address');
             $table->string('contact_number');
-            $table->string('email');
             $table->enum('gender', ['MALE', 'FEMALE']);
             $table->date('date_of_birth');
             $table->timestamps();

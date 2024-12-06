@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('instructor_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('grade', [
                 '1.00', '1.25', '1.50', '1.75',
                 '2.00', '2.25', '2.50', '2.75',

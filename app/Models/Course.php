@@ -21,11 +21,12 @@ class Course extends Model
         'year_level'
     ];
 
-    public function schedules(): HasMany {
-        return $this->hasMany(Schedule::class);
-    }
 
     public function students(): belongsToMany {
         return $this->belongsToMany(Student::class)->with(['grade']);
+    }
+
+    public function enrollment(): belongsToMany {
+        return $this->belongsToMany(Enrollment::class);
     }
 }

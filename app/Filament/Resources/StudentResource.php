@@ -51,6 +51,7 @@ class StudentResource extends Resource
                     ->schema(static::getDetailsFormSchema()),
                 Forms\Components\Section::make('Student Checklist')
                     ->schema([static::getItemsRepeater()])
+                    ->hiddenOn('create')
                ]);
     }
 
@@ -295,5 +296,12 @@ class StudentResource extends Resource
             ->addActionLabel('Add grade')
             ->hiddenLabel()
             ->defaultItems(0);
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['user_id'] = auth()->id();
+
+        return $data;
     }
 }

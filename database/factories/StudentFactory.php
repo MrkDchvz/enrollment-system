@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Student>
@@ -18,17 +21,28 @@ class StudentFactory extends Factory
     {
         $currentYear = date('Y');
         $randomNumber = $currentYear. $this->faker->numerify('######');
+        $firstName = $this->faker->firstName();
+        $lastName = $this->faker->lastName();
+        $middleName = $this->faker->lastName();
+        $student = User::factory()->create([
+            'name' => "{$firstName} {$middleName} {$lastName}",
+            'email' => 'student@gmail.com',
+            'password' => Hash::make('student')
+        ]);
+
+        $role = Role::create(['name' => 'Student']);
+        $student->assignRole('Student');
         return [
             'student_number' => $randomNumber,
-            'first_name' => strtoupper($this->faker->firstName()),
-            'last_name' => strtoupper($this->faker->lastName()),
-            'middle_name' => strtoupper($this->faker->lastName()),
+            'user_id' => $student->id,
+            'first_name' => strtoupper($firstName),
+            'last_name' => strtoupper($lastName),
+            'middle_name' => strtoupper($middleName),
             'gender' => $this->faker->randomElement(['MALE', 'FEMALE']),
             'date_of_birth' => $this->faker->date(),
             'address' => $this->faker->address(),
             //Philippine Number Regex
             'contact_number' => $this->faker->regexify('^(09|\+639)\d{9}$'),
-            'email' => $this->faker->unique()->safeEmail(),
         ];
     }
 }

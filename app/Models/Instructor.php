@@ -25,9 +25,6 @@ class Instructor extends Model
         return $this->belongsTo(Department::class);
     }
 
-    public function schedules() : HasMany {
-        return $this->hasMany(Schedule::class);
-    }
 
 
 }
