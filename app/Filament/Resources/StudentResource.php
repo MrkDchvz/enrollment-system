@@ -270,10 +270,12 @@ class StudentResource extends Resource
             Forms\Components\TextInput::make('contact_number')
                 ->tel()
                 ->telRegex('/^(09|\+639)\d{9}$/')
+                ->unique('users')
                 ->placeholder("+639171234567")
                 ->required(),
             Forms\Components\TextInput::make('email')
                 ->email()
+                ->unique('users')
                 ->required(),
         ];
     }

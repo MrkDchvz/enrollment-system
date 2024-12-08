@@ -6,6 +6,7 @@ use App\Filament\Resources\StudentResource;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 
 class CreateStudent extends CreateRecord
@@ -23,6 +24,10 @@ class CreateStudent extends CreateRecord
             'password' => Hash::make($data['password']),
             ]);
         $user->assignRole('Student');
+
+        $user->email_verified_at = Date::now();
+        $user->save();
+
 
         unset($data['email']);
         unset($data['password']);

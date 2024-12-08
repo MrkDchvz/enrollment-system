@@ -30,6 +30,7 @@ class StudentChecklist extends Component implements HasForms, HasTable
 
     public function table(Table $table): Table {
         return $table
+            ->emptyStateHeading('No Grades Recorded')
             ->query(CourseStudent::query()->where('student_id', $this->studentId))
             ->columns([
                 textColumn::make('course.course_code')
