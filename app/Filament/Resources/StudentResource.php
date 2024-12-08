@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 //Plugin
+use App\Livewire\StudentChecklist;
 use App\Models\Instructor;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
@@ -20,6 +21,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Infolists\Components\Livewire;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -151,6 +153,7 @@ class StudentResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
+        $student_id = $infolist->record->id;
         return $infolist
             ->schema([
                 TextEntry::make('student_number')
@@ -174,13 +177,10 @@ class StudentResource extends Resource
                         ->dateTime()
                 ]),
                 Fieldset::make('Checklist')->schema([
-                    KeyValueEntry::make('grades')
-                        ->label('')
-                        ->keyLabel('Course')
-                        ->valueLabel('Grade')
-                        ->alignment(Alignment::Center),
-
-                ]),
+                    Livewire::make(StudentChecklist::class, ['studentId' =>$student_id])
+                    ->columnSpanFull(),
+                ])
+                ->columnSpanFull(),
 
             ]);
     }
@@ -228,6 +228,17 @@ class StudentResource extends Resource
                     ->required()
 
             ]),
+            Forms\Components\TextInput::make('password')
+                ->label('Password')
+                ->maxLength(255)
+                ->password()
+                ->required(),
+            Forms\Components\TextInput::make('password_confirmation')
+                ->password()
+                ->required()
+                ->maxLength(255)
+                ->same('password')
+                ->label('Confirm Password'),
             Forms\Components\TextInput::make('address')
                 ->placeholder('B9 L8 MANCHESTER ST. MOLINO 3, BACOOR CAVITE')
                 ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()'])
