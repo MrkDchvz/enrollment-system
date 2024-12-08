@@ -68,6 +68,18 @@ class StudentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                if (auth()->user()->hasRole('Admin')) {
+                    return $query;
+                }
+                else {
+                    return $query->where('user_id', auth()->id());
+                }
+
+
+
+            },
+)
             ->columns([
                 TextColumn::make('student_number')
 
@@ -232,13 +244,15 @@ class StudentResource extends Resource
                 ->label('Password')
                 ->maxLength(255)
                 ->password()
+                ->hiddenOn('edit')
                 ->required(),
             Forms\Components\TextInput::make('password_confirmation')
                 ->password()
                 ->required()
                 ->maxLength(255)
                 ->same('password')
-                ->label('Confirm Password'),
+                ->label('Confirm Password')
+                ->hiddenOn('edit'),
             Forms\Components\TextInput::make('address')
                 ->placeholder('B9 L8 MANCHESTER ST. MOLINO 3, BACOOR CAVITE')
                 ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()'])
