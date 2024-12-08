@@ -41,7 +41,7 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $recordTitleAttribute = 'student_number';
+    protected static ?string $recordTitleAttribute = 'full_name';
 
     protected static ?string $navigationGroup = 'Student Management';
 
@@ -67,6 +67,46 @@ class StudentResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        $filters = [];
+
+        if (auth()->user()->hasRole('Admin')) {
+            $filters = [[
+                Tables\Filters\TrashedFilter::make(),
+                SelectFilter::make('gender')
+                    ->options([
+                        'MALE' => 'Male',
+                        'FEMALE' => 'Female',
+                    ]),
+                Filter::make('date_of_birth')
+                    ->form([
+                        DatePicker::make('date_of_birth')
+                    ])
+                    ->query(function (Builder $query, array $data) : Builder {
+                        return $query
+                            ->when(
+                                $data['date_of_birth'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('date_of_birth', $data['date_of_birth'])
+                            );
+                    }),
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from'),
+                        DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+            ]];
+        }
+
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 if (auth()->user()->hasRole('Admin')) {
@@ -74,12 +114,8 @@ class StudentResource extends Resource
                 }
                 else {
                     return $query->where('user_id', auth()->id());
-                }
-
-
-
-            },
-)
+                }}
+            )
             ->columns([
                 TextColumn::make('student_number')
 
@@ -114,40 +150,7 @@ class StudentResource extends Resource
 
 
             ])
-            ->filters([
-                SelectFilter::make('gender')
-                    ->options([
-                        'MALE' => 'Male',
-                        'FEMALE' => 'Female',
-                    ]),
-                Filter::make('date_of_birth')
-                    ->form([
-                        DatePicker::make('date_of_birth')
-                    ])
-                    ->query(function (Builder $query, array $data) : Builder {
-                        return $query
-                            ->when(
-                                $data['date_of_birth'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('date_of_birth', $data['date_of_birth'])
-                            );
-                    }),
-                Filter::make('created_at')
-                    ->form([
-                        DatePicker::make('created_from'),
-                        DatePicker::make('created_until'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    })
-            ])
+            ->filters($filters)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
@@ -216,7 +219,10 @@ class StudentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        if (auth()->user()->hasRole('Admin')) {
+            return static::getModel()::count();
+        }
+        return null;
     }
     public static function getDetailsFormSchema(): array {
         return [
