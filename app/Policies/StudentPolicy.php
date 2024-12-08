@@ -66,6 +66,17 @@ class StudentPolicy
 
     public function deleteAny(User $user): bool
     {
-        return false;
+        return $user->hasRole(['Admin']);
     }
+
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->hasRole(['Admin']);
+    }
+
+    public function restoreAny(User $user): bool {
+        return $user->hasRole(['Admin']);
+    }
+
+
 }

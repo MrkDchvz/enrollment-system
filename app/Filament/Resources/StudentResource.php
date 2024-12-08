@@ -41,7 +41,7 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $recordTitleAttribute = 'full_name';
+    protected static ?string $recordTitleAttribute = 'student_number';
 
     protected static ?string $navigationGroup = 'Student Management';
 
@@ -70,7 +70,7 @@ class StudentResource extends Resource
         $filters = [];
 
         if (auth()->user()->hasRole('Admin')) {
-            $filters = [[
+            $filters = [
                 Tables\Filters\TrashedFilter::make(),
                 SelectFilter::make('gender')
                     ->options([
@@ -104,7 +104,7 @@ class StudentResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
-            ]];
+            ];
         }
 
         return $table

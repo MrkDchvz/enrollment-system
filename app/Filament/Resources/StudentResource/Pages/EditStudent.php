@@ -21,6 +21,7 @@ class EditStudent extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+
         if (isset($data['email'])) {
             $student = Student::where('student_number', $data['student_number'])->first();
             if ($student->user) {
@@ -34,6 +35,7 @@ class EditStudent extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
+        dd($data);
         $student = Student::where('student_number', $data['student_number'])->first();
         $data['email'] = $student->email;
         return $data;
