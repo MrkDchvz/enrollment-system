@@ -71,6 +71,7 @@ class EnrollmentResource extends Resource
                 ->relationship('student', 'student_number')
                 ->required()
                 ->reactive()
+                ->preload()
                 ->afterStateUpdated(function ($state, Forms\Set $set) {
                     $set('student_name', Student::class::find($state)->full_name ?? '');
                     $set('semester', static::getCurrentSemester());

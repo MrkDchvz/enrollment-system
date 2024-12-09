@@ -37,4 +37,5 @@ class CreateStudent extends CreateRecord
 
         return $data;
     }
+
 }

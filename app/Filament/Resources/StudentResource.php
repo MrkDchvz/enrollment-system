@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 //Plugin
 use App\Livewire\StudentChecklist;
 use App\Models\Instructor;
+use App\Models\User;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 
@@ -227,11 +228,8 @@ class StudentResource extends Resource
     public static function getDetailsFormSchema(): array {
         return [
             Forms\Components\TextInput::make('student_number')
-                ->default(fn() => Student::class::generateUniqueStudentNumber())
-                ->readonly()
-                ->disabled()
-                ->dehydrated()
                 ->required()
+                ->hiddenOn('edit')
                 ->columnSpanFull(),
             Forms\Components\Grid::make(3)->schema([
                 Forms\Components\TextInput::make('first_name')
@@ -246,43 +244,50 @@ class StudentResource extends Resource
                     ->required()
 
             ]),
-            Forms\Components\TextInput::make('password')
+
+            Forms\Components\Grid::make(2)->schema([Forms\Components\TextInput::make('password')
                 ->label('Password')
                 ->maxLength(255)
                 ->password()
                 ->hiddenOn('edit')
                 ->required(),
-            Forms\Components\TextInput::make('password_confirmation')
-                ->password()
-                ->required()
-                ->maxLength(255)
-                ->same('password')
-                ->label('Confirm Password')
-                ->hiddenOn('edit'),
+                Forms\Components\TextInput::make('password_confirmation')
+                    ->password()
+                    ->required()
+                    ->maxLength(255)
+                    ->same('password')
+                    ->label('Confirm Password')
+                    ->hiddenOn('edit')]),
+
             Forms\Components\TextInput::make('address')
                 ->placeholder('B9 L8 MANCHESTER ST. MOLINO 3, BACOOR CAVITE')
                 ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()'])
                 ->required()
                 ->columnSpanFull(),
-            Forms\Components\Select::make('gender')
-                ->options([
-                    'MALE' => 'Male',
-                    'FEMALE' => 'Female',
-                ])
-                ->native(false)
-                ->required(),
-            DatePicker::make('date_of_birth')
-                ->required(),
-            Forms\Components\TextInput::make('contact_number')
-                ->tel()
-                ->telRegex('/^(09|\+639)\d{9}$/')
-                ->unique('users')
-                ->placeholder("+639171234567")
-                ->required(),
-            Forms\Components\TextInput::make('email')
-                ->email()
-                ->unique('users')
-                ->required(),
+
+            Forms\Components\Grid::make(3)->schema([
+                Forms\Components\Select::make('gender')
+                    ->options([
+                        'MALE' => 'Male',
+                        'FEMALE' => 'Female',
+                    ])
+                    ->native(false)
+                    ->required(),
+                DatePicker::make('date_of_birth')
+                    ->required(),
+                Forms\Components\TextInput::make('contact_number')
+                    ->tel()
+                    ->telRegex('/^(09|\+639)\d{9}$/')
+                    ->unique('users')
+                    ->placeholder("+639171234567")
+                    ->required(),
+            ]),
+
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->unique(table: Student::class, ignoreRecord: true)
+                    ->required(),
+
         ];
     }
 

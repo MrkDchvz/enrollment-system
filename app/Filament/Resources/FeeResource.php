@@ -76,7 +76,7 @@ class FeeResource extends Resource
             Forms\Components\TextInput::make('amount')
                 ->numeric()
                 ->inputMode('decimal')
-                ->minValue(1)
+                ->minValue(0.01)
                 ->required()
                 ->prefix("₱")
                 ,
