@@ -13,6 +13,7 @@ use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Models\Course;
 use App\Models\Student;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
@@ -109,14 +110,14 @@ class StudentResource extends Resource
         }
 
         return $table
-            ->modifyQueryUsing(function (Builder $query) {
-                if (auth()->user()->hasRole('Admin')) {
-                    return $query;
-                }
-                else {
-                    return $query->where('user_id', auth()->id());
-                }}
-            )
+//            ->modifyQueryUsing(function (Builder $query) {
+//                if (auth()->user()->hasRole('Admin')) {
+//                    return $query;
+//                }
+//                else {
+//                    return $query->where('user_id', auth()->id());
+//                }}
+//            )
             ->columns([
                 TextColumn::make('student_number')
 
@@ -163,6 +164,16 @@ class StudentResource extends Resource
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        if (auth()->user()->hasRole('Student')) {
+            return parent::getEloquentQuery()->where('user_id', auth()->id());
+        } else {
+            return parent::getEloquentQuery();
+        }
+
     }
 
 
@@ -274,7 +285,8 @@ class StudentResource extends Resource
                     ->native(false)
                     ->required(),
                 DatePicker::make('date_of_birth')
-                    ->required(),
+                    ->required()
+                    ->before(Carbon::today()->toString()),
                 Forms\Components\TextInput::make('contact_number')
                     ->tel()
                     ->telRegex('/^(09|\+639)\d{9}$/')

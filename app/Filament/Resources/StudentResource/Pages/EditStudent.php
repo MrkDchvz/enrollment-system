@@ -40,4 +40,10 @@ class EditStudent extends EditRecord
         $data['email'] = $student->email;
         return $data;
     }
+
+//    Redirect to table
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
