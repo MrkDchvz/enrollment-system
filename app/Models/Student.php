@@ -29,7 +29,8 @@ class Student extends Model
         'email',
         'gender',
         'date_of_birth',
-        'user_id'
+        'user_id',
+        'deleted_at'
     ];
 
 
