@@ -203,7 +203,8 @@ class StudentResource extends Resource
                         ->dateTime(),
                     TextEntry::make('updated_at')
                         ->dateTime()
-                ]),
+                ])
+                ->visible(auth()->user()->hasRole('Admin')),
                 Fieldset::make('Checklist')->schema([
                     Livewire::make(StudentChecklist::class, ['studentId' =>$student_id])
                     ->columnSpanFull(),

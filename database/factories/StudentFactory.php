@@ -19,8 +19,6 @@ class StudentFactory extends Factory
      */
     public function definition(): array
     {
-        $currentYear = date('Y');
-        $randomNumber = $currentYear. $this->faker->numerify('######');
         $firstName = $this->faker->firstName();
         $lastName = $this->faker->lastName();
         $middleName = $this->faker->lastName();
@@ -33,7 +31,7 @@ class StudentFactory extends Factory
         $role = Role::create(['name' => 'Student']);
         $student->assignRole('Student');
         return [
-            'student_number' => $randomNumber,
+            'student_number' => $this->faker->regexify('^20\d{7}$'),
             'user_id' => $student->id,
             'first_name' => strtoupper($firstName),
             'last_name' => strtoupper($lastName),
