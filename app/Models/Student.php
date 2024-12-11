@@ -52,8 +52,17 @@ class Student extends Model
 
 
 
-    public function assignRole(string $string)
-    {
+
+    protected static function booted() : void {
+        //    Soft Delete the user associated with the soft-deleted student.
+        static::deleting(function($student) {
+            $student->user->delete();
+        });
+        //    Restore the user associated when restoring a  student.
+        static::restoring(function($student) {
+            $student->user->restore();
+        });
+
     }
 
     protected function fullName() : Attribute
@@ -81,7 +90,7 @@ class Student extends Model
     }
 
     public function user () : BelongsTo {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function enrollments(): HasMany {

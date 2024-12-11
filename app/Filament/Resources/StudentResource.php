@@ -73,7 +73,6 @@ class StudentResource extends Resource
 
         if (auth()->user()->hasRole('Admin')) {
             $filters = [
-                Tables\Filters\TrashedFilter::make(),
                 SelectFilter::make('gender')
                     ->options([
                         'MALE' => 'Male',
@@ -136,6 +135,7 @@ class StudentResource extends Resource
                 })
                     ->sortable(['first_name'])
                     ->searchable(['first_name', 'middle_name', 'last_name'], isIndividual: true),
+                // This is an attribute
                 TextColumn::make('email')
                     ->toggleable()
                     ->searchable(isIndividual: true),
@@ -149,21 +149,21 @@ class StudentResource extends Resource
                     ->toggleable(),
                 TextColumn::make('contact_number')
                     ->toggleable(),
+                TextColumn::make('deleted_at')
+                    ->toggleable()
+                    ->visible(fn($record) => $record && $record->trashed()),
 
 
             ])
             ->filters($filters)
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
+//                Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                Tables\Actions\EditAction::make(),
-            ], position: ActionsPosition::BeforeColumns)
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ForceDeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),
-            ]);
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
+            ], position: ActionsPosition::BeforeColumns);
     }
 
     public static function getEloquentQuery(): Builder
@@ -196,6 +196,7 @@ class StudentResource extends Resource
                 TextEntry::make('address')
                     ->columnSpanFull(),
                 TextEntry::make('contact_number'),
+                // This is an attribute
                 TextEntry::make('email'),
                 Fieldset::make('Timestamps')->schema([
                     TextEntry::make('created_at')
@@ -229,17 +230,12 @@ class StudentResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        if (auth()->user()->hasRole('Admin')) {
-            return static::getModel()::count();
-        }
-        return null;
-    }
     public static function getDetailsFormSchema(): array {
         return [
             Forms\Components\TextInput::make('student_number')
                 ->required()
+                ->placeholder('E.g. 20xxxxxxx')
+                ->regex('/^20\d{7}$/')
                 ->hiddenOn('edit')
                 ->columnSpanFull(),
             Forms\Components\Grid::make(3)->schema([
