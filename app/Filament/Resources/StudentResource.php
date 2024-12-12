@@ -14,6 +14,7 @@ use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Models\Course;
 use App\Models\Student;
 use Carbon\Carbon;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
@@ -37,6 +38,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 
 class StudentResource extends Resource
@@ -235,6 +238,7 @@ class StudentResource extends Resource
         return [
             Forms\Components\TextInput::make('student_number')
                 ->required()
+                ->unique()
                 ->placeholder('E.g. 20xxxxxxx')
                 ->regex('/^20\d{7}$/')
                 ->hiddenOn('edit')
@@ -293,9 +297,22 @@ class StudentResource extends Resource
             ]),
 
                 Forms\Components\TextInput::make('email')
+                    ->required()
                     ->email()
-                    ->unique(table: Student::class, ignoreRecord: true)
-                    ->required(),
+                    ->rules([
+                        static function (Forms\Components\Component $component) : Closure {
+                            return static function (string $attribute, $value, Closure $fail ) use ($component)  {
+                                $existingUser = User::withTrashed()
+                                    ->where('email', Str::lower($value))
+                                    ->first();
+
+                                // Fails Validation if email already exists on the database
+                                if ($existingUser && $existingUser->id !== $component->getRecord()?->user_id) {
+                                    $fail('Email already exists.');
+                                }
+                            };
+                        }
+                    ]),
 
         ];
     }
