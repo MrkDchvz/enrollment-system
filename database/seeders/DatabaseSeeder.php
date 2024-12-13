@@ -23,11 +23,37 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Create an Admin Account
+        $role = Role::create(['name' => 'Admin']);
         $admin = User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin')
         ]);
+
+
+        $admin->assignRole('Admin');
+
+        // Create an Student Account
+        $role = Role::create(['name' => 'Student']);
+
+        $studentUser = User::factory()->create([
+            'name' => 'student',
+            'email' => 'student@gmail.com',
+            'password' => Hash::make('student')
+        ]);
+
+        $studentUser->assignRole('Student');
+
+
+        $student = Student::factory()->create([
+            'first_name' => 'student',
+            'last_name' => 'student',
+            'user_id' => $studentUser->id,
+        ]);
+
+
+
+
 
 
         $this->call([
@@ -41,8 +67,9 @@ class DatabaseSeeder extends Seeder
         Instructor::factory()->count(10)->create();
 
 
-        $role = Role::create(['name' => 'Admin']);
-        $admin->assignRole('Admin');
-//        $permission = Permission::create(['name' => 'add student']);
+
+
+
+
     }
 }

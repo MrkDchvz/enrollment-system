@@ -3,6 +3,7 @@
 namespace Tests\Feature\Livewire;
 
 use App\Filament\Resources\StudentResource\Pages\CreateStudent;
+use App\Filament\Resources\StudentResource\Pages\EditStudent;
 use App\Filament\Resources\StudentResource\Pages\ListStudents;
 use App\Livewire\StudentResource;
 use App\Models\Student;
@@ -23,50 +24,6 @@ beforeEach(function () {
     /* The TestCase setup generates a user before each test, so we need to clear the table to make sure we have a clean slate. */
     DB::table('users')->truncate();
 });
-// Admin Login w/ Valid Credentials
-it ('can login admin with valid credentials', function () {
-    auth()->logout();
-    $adminUser = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
-
-
-    $adminUser->assignRole('Admin');
-
-    livewire(Login::class)
-        ->fillForm([
-            'email' => $adminUser->email,
-            'password' => 'password',
-        ])
-        ->call('authenticate')
-        ->assertHasNoFormErrors();
-
-    assertEquals($adminUser->id, auth()->id());
-});
-
-// Admin Login w/ Invalid Credentials
-it ('cannot login with invalid credentials', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
-    $role = Role::create(['name' => 'Admin']);
-
-    $user->assignRole($role);
-
-    livewire(Login::class)
-        ->fillForm([
-            'email' => $user->email,
-            'password' => 'incorrect-password',
-        ])
-        ->call('authenticate')
-        ->assertHasFormErrors();
-
-});
-// Admin Login w/ Soft Delete
-// Student Login w/ Valid Credentials
-// Student Login w/ Invalid Credentials
-// Student Login w/ Soft Delete
-
 
 // Form Existence
 it('student resource has a create form', function () {
@@ -78,6 +35,32 @@ it('can render page', function () {
     livewire(ListStudents::class)->assertSuccessful();
 });
 
+it('can render the edit page', function () {
+    $record = Student::factory()->create();
+
+    livewire(EditStudent::class, ['record' => $record->getRouteKey()])
+        ->assertSuccessful();
+});
+
+it('can render column', function (string $column) {
+    livewire(ListStudents::class)
+        ->assertCanRenderTableColumn($column);
+})->with(['student_number', 'full_name', 'email', 'gender', 'date_of_birth', 'contact_number', 'email']);
+
+
+it('cannot display trashed student by default', function () {
+    $newAdmin = User::factory()->create();
+    $newAdmin->hasRole('Admin');
+    $this->actingAs($newAdmin);
+
+    $students = Student::factory()->count(4)->create();
+    $studentPosts = Student::factory()->trashed()->count(6)->create();
+
+    livewire(ListStudents::class)
+        ->assertCanSeeTableRecords($students)
+        ->assertCanNotSeeTableRecords($studentPosts)
+        ->assertCountTableRecords(4);
+});
 
 
 

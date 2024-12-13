@@ -22,13 +22,13 @@ class StudentFactory extends Factory
         $firstName = $this->faker->firstName();
         $lastName = $this->faker->lastName();
         $middleName = $this->faker->lastName();
+        $email = $this->faker->unique()->safeEmail();
         $student = User::factory()->create([
             'name' => "{$firstName} {$middleName} {$lastName}",
-            'email' => 'student@gmail.com',
+            'email' => $email,
             'password' => Hash::make('student')
         ]);
 
-        $role = Role::create(['name' => 'Student']);
         $student->assignRole('Student');
         return [
             'student_number' => $this->faker->regexify('^20\d{7}$'),

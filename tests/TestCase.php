@@ -16,6 +16,7 @@ abstract class TestCase extends BaseTestCase
             'password' => Hash::make('password')
         ]);
         $role = Role::create(['name' => 'Admin']);
+        Role::create(['name' => 'Student']);
 
         $user->assignRole($role);
 
