@@ -139,9 +139,10 @@ class StudentResource extends Resource
                     ->sortable(['first_name'])
                     ->searchable(['first_name', 'middle_name', 'last_name'], isIndividual: true),
                 // This is an attribute
-                TextColumn::make('email')
+                TextColumn::make('user.email')
+                    ->label('email')
                     ->toggleable()
-                    ->searchable(isIndividual: true),
+                    ->searchable(),
                 TextColumn::make('gender')
                     ->toggleable(),
                 TextColumn::make('date_of_birth')
@@ -149,13 +150,14 @@ class StudentResource extends Resource
                     ->toggleable()
                     ->date('F j, Y'),
                 TextColumn::make('address')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->searchable(),
                 TextColumn::make('contact_number')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->searchable(),
                 TextColumn::make('deleted_at')
                     ->toggleable()
                     ->visible(fn($record) => $record && $record->trashed()),
-
 
             ])
             ->filters($filters)
@@ -254,7 +256,6 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('last_name')
                     ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()'])
                     ->required()
-
             ]),
 
             Forms\Components\Grid::make(2)->schema([Forms\Components\TextInput::make('password')
@@ -313,10 +314,8 @@ class StudentResource extends Resource
                             };
                         }
                     ]),
-
         ];
     }
-
     public static function getItemsRepeater(): TableRepeater {
         return TableRepeater::make('courseStudents')
             ->headers([
@@ -386,6 +385,4 @@ class StudentResource extends Resource
             ->hiddenLabel()
             ->defaultItems(0);
     }
-
-
 }

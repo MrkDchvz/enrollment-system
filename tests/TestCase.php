@@ -21,7 +21,14 @@ abstract class TestCase extends BaseTestCase
         $user->assignRole($role);
 
         $this->actingAs($user);
-
     }
-    //
+
+    protected function actingAsAdmin(): User
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin'); // Ensure the role is assigned properly
+        $this->actingAs($admin);
+
+        return $admin;
+    }
 }
