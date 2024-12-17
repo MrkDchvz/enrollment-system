@@ -13,7 +13,7 @@ class StudentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Student', 'Admin']);
+        return $user->hasRole(['Student', 'Admin', 'Officer']);
     }
 
     /**
@@ -21,7 +21,7 @@ class StudentPolicy
      */
     public function view(User $user, Student $student): bool
     {
-        return $user->hasRole(['Student', 'Admin']);
+        return $user->hasRole(['Student', 'Admin', 'Officer']);
     }
 
     /**
@@ -29,7 +29,7 @@ class StudentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Admin']);
+        return $user->hasRole(['Admin', 'Officer']);
     }
 
     /**
@@ -37,7 +37,7 @@ class StudentPolicy
      */
     public function update(User $user, Student $student): bool
     {
-        return $user->hasRole(['Admin']);
+        return $user->hasRole(['Admin', 'Officer']);
     }
 
     /**

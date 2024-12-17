@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -177,7 +178,34 @@ it('can soft delete a record', function () {
     ]);
 });
 
+it('can validate required', function (string $column) {
+    livewire(CreateStudent::class)
+        ->fillForm([$column => null])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasFormErrors([$column => ['required']]);
+})->with(['student_number', 'first_name', 'last_name', 'email', 'gender' , 'contact_number', 'address', 'date_of_birth', 'password', 'password_confirmation']);
 
+// NOTE: Email has different way of validation refer to SPECIFIC SCENARIOS - EMAIL SECTION
+it('can validate unique', function (string $column) {
+    $this->actingAsAdmin();
+    // NOTE: 'create' inserts the record to the database while 'make' creates a model instance but not insert it to the database.
+    $record = Student::factory()->create();
+
+    livewire(CreateStudent::class)
+        ->fillForm([
+            'student_number' => $record->student_number,
+            'contact_number' => $record->contact_number,
+        ])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasFormErrors([$column => ['unique']]);
+})->with(['student_number', 'contact_number']);
+
+
+
+
+// TESTING FOR SPECIFIC SCENARIOS FOR STUDENT RESOURCE
 it('should fail to create a student with a duplicate student number', function () {
     // Create an initial student record
     // NOTE: 'create' inserts the record to the database while 'make' creates a model instance but not insert it to the database.
@@ -192,7 +220,8 @@ it('should fail to create a student with a duplicate student number', function (
         ->assertHasErrors(); // Ensure the form has a unique validation error for student_number
 });
 
-it('fails validation when student_number does not match the regex pattern', function () {
+// STUDENT NUMBER VALIDATION
+it('fails validation when student_number does not match the appropriate pattern', function () {
     // Attempt to create a student with an invalid student_number
     livewire(CreateStudent::class)
         ->fillForm([
@@ -202,7 +231,7 @@ it('fails validation when student_number does not match the regex pattern', func
         ->assertHasFormErrors();
 });
 
-it('passes validation when student_number matches the regex pattern', function () {
+it('passes validation when student_number matches the appropriate pattern', function () {
     // Attempt to create a student with a valid student_number
     livewire(CreateStudent::class)
         ->fillForm([
@@ -212,7 +241,9 @@ it('passes validation when student_number matches the regex pattern', function (
         ->assertHasFormErrors();
 });
 
-it('should fail when an existing email is entered upon creation', function () {
+
+// EMAIL VALIDATION
+it('fails when an existing email is entered upon student record creation/submitting', function () {
     $existingStudent = Student::factory()->create();
     $existingEmail = $existingStudent->email;
     livewire(CreateStudent::class)
@@ -223,7 +254,45 @@ it('should fail when an existing email is entered upon creation', function () {
         ->assertHasFormErrors();
 });
 
+it('fails when invalid email pattern is inserted', function (string $column) {
+    livewire(CreateStudent::class)
+        ->fillForm(['email' => Str::random()])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasFormErrors([$column => ['email']]);
+})->with(['email']);
 
+it('passes when valid email pattern is inserted', function (string $column) {
+    livewire(CreateStudent::class)
+        ->fillForm(['email' => 'valid@email.com'])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasNoFormErrors([$column => ['email']]);
+})->with(['email']);
+
+
+// CONTACT NUMBER VALIDATION
+it('passes valdiation when contact number matches the regex pattern', function (string $column) {
+    livewire(CreateStudent::class)
+        ->fillForm(['contact_number' => '9774420018'])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasNoFormErrors([$column => ['contact_number']]);
+})->with(['contact_number']);
+
+it('fails validation when contact number does not match the regex pattern', function (string $invalidNumber) {
+    livewire(CreateStudent::class)
+        ->fillForm(['contact_number' => $invalidNumber])
+        ->assertActionExists('create')
+        ->call('create')
+        ->assertHasFormErrors(['contact_number']);
+})->with(['8639930029',      // Invalid: Doesn't start with 9
+          '96699300291',     // Invalid: Too long
+          '669930029',       // Invalid: Too short
+          '+639669930029',   // Invalid: Starts with +63
+          '966-993-0029',    // Invalid: Contains dashes
+          'abcdefg9999',     // Invalid: Contains letters]);
+]);
 
 
 

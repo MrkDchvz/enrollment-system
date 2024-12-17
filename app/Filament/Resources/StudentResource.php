@@ -291,9 +291,11 @@ class StudentResource extends Resource
                     ->before(Carbon::today()->toString()),
                 Forms\Components\TextInput::make('contact_number')
                     ->tel()
-                    ->telRegex('/^(09|\+639)\d{9}$/')
-                    ->unique('users')
-                    ->placeholder("+639171234567")
+                    ->prefix('+63')
+                    ->telRegex('/^9\d{9}$/')
+                    // Removed Users as table here Check for bugs
+                    ->unique()
+                    ->placeholder("9171234567")
                     ->required(),
             ]),
 
