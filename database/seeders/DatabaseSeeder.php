@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 
         $admin->assignRole('Admin');
 
-        // Create an Student Account
+        // Create a Student Account
         $role = Role::create(['name' => 'Student']);
 
         $studentUser = User::factory()->create([
@@ -44,15 +44,35 @@ class DatabaseSeeder extends Seeder
 
         $studentUser->assignRole('Student');
 
-
         $student = Student::factory()->create([
             'first_name' => 'student',
             'last_name' => 'student',
             'user_id' => $studentUser->id,
         ]);
 
+        // Create an Officer Account
 
+        $role = Role::create(['name' => 'Officer']);
 
+        $officer = User::factory()->create([
+            'name' => 'officer',
+            'email' => 'officer@gmail.com',
+            'password' => Hash::make('officer')
+        ]);
+
+        $officer->assignRole('Officer');
+
+        // Create a Registrar Account
+
+        $role = Role::create(['name' => 'Registrar']);
+
+        $registrar = User::factory()->create([
+            'name' => 'registrar',
+            'email' => 'registrar@gmail.com',
+            'password' => Hash::make('registrar')
+        ]);
+
+        $registrar->assignRole('Registrar');
 
 
 
