@@ -77,6 +77,8 @@ class StudentResource extends Resource
         if (auth()->user()->hasRole('Admin')) {
             $filters = [
                 SelectFilter::make('gender')
+                        // Key (in the database) => Display in the forms
+                        //  MALE is in the database and Male is what would be shown in form
                     ->options([
                         'MALE' => 'Male',
                         'FEMALE' => 'Female',

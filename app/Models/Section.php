@@ -25,12 +25,13 @@ class Section extends Model
     }
 
     protected function sectionName() : Attribute
+//    WARNING: this can result to duplicates because the school_year is not included
+//    If there is a BSCS 3-1 in 2012 and BSCS 3-1 in 2024
+//    Both of them will be displayed as "BSCS 3-1"
     {
         return Attribute::make(
             get: fn ($value, $attributes) => trim(
-                "{$this->department->department_code}
-                       {$attributes['year_level']}-{$attributes['class_number']}
-                       {$attributes['school_year']}"
+                "{$this->department->department_code} {$attributes['year_level']}-{$attributes['class_number']}"
             )
         );
     }

@@ -15,14 +15,33 @@ class SectionSeeder extends Seeder
      */
     public function run(): void
     {
-        $departmentId = Department::where('department_code', 'BSCS')->first();
+        $totalYearLevel = 4;
+        $totalClassNumbers = 7;
+
         $currentYear = Carbon::now()->year;
         $nextYear = $currentYear + 1;
-        DB::table('sections')->insert([
-            'department_id' => $departmentId->id,
-            'school_year' => "{$currentYear}-{$nextYear}",
-            'class_number' => 1,
-            'year_level' => 3,
-        ]);
+        $schoolYear =  "{$currentYear}-{$nextYear}";
+
+        $CS_Department = Department::where('department_code', 'BSCS')->first();
+        $IT_Department = Department::where('department_code', 'BSIT')->first();
+        for ($i = 1; $i <= $totalYearLevel; $i++) {
+            for ($j = 1; $j <= $totalClassNumbers; $j++) {
+                DB::table('sections')->insert([
+                    'department_id' => $CS_Department->id,
+                    'school_year' => $schoolYear,
+                    'class_number' => $j,
+                    'year_level' => $i,
+                    ]);
+
+                DB::table('sections')->insert([
+                    'department_id' => $IT_Department->id,
+                    'school_year' => $schoolYear,
+                    'class_number' => $j,
+                    'year_level' => $i,
+                ]);
+            }
+        }
+
+
     }
 }
