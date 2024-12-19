@@ -7,15 +7,21 @@ use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
 use App\Models\Department;
 use App\Models\Enrollment;
+use App\Models\Section;
 use App\Models\Student;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 
 class EnrollmentResource extends Resource
 {
@@ -33,10 +39,79 @@ class EnrollmentResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('student.student_number')
+                    ->label('Student Number')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('student.full_name')
+                    ->label('Full Name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('department.department_code')
+                    ->label('Department')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'BSCS' => 'danger',
+                        'BSIT' => 'success',
+
+                    })
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('registration_status')
+                    ->label('Registration Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'IRREGULAR' => 'info',
+                        'REGULAR' => 'success',
+                    })
+                    ->icon(fn (string $state): ?string => match ($state) {
+                        'IRREGULAR' => 'heroicon-o-arrow-path-rounded-square', // Icon for irregular
+                        'REGULAR' => 'heroicon-o-check',        // Icon for regular
+                    })
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('enrollment_date')
+                    ->label('Enrollment Date')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('year_level')
+                ->label('Year Level')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('semester')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('section.sectionName')
+                    ->label('Section')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('school_year')
+                    ->label('School Year')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('old_new_student')
+                    ->label('Old/New Student')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Encoder')
+                    ->searchable()
+                    ->toggleable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('semester')
+                    // Key (in the database) => Display in the forms
+                    ->options([
+                        '1st Semester' => '1st Semester',
+                        '2nd Semester' => '2nd Semester',
+                    ]),
+
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->relationship('department', 'department_code')
+                    ->preload(),
+                SelectFilter::make('school_year')
+                    ->label('School Year')
+                    ->options(function () {
+                        return Enrollment::select('school_year')
+                                ->distinct()
+                                ->pluck('school_year', 'school_year');
+                    })
+                    ->searchable(),
+                SelectFilter::make('old_new_student')
+                    ->label('Old /New Student')
+
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -47,6 +122,17 @@ class EnrollmentResource extends Resource
                 ]),
             ]);
     }
+    public static function getEloquentQuery(): Builder
+    {
+        if (auth()->user()->hasRole('Student')) {
+            $student = Student::where('user_id', auth()->id())->firstOrFail();
+            return parent::getEloquentQuery()->where('student_id', $student->id);
+        } else {
+            return parent::getEloquentQuery();
+        }
+
+    }
+
 
     public static function getRelations(): array
     {

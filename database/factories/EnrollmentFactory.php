@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Department;
 use App\Models\Student;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +21,17 @@ class EnrollmentFactory extends Factory
      */
     public function definition(): array
     {
-        $department = DB::table('departments')->inRandomOrder()->first();
+        $department = Department::inRandomOrder()->firstOrFail();
+        // in_array ensures that the value will be either BSCS or BSIT
+        if (in_array($department->department_code, ['BSCS', 'BSIT'])) {
+            $section = DB::table('sections')
+                ->where('department_code', $department->department_code)
+                ->inRandomOrder()
+                ->first();
+        }
+
         $section = DB::table('sections')->inRandomOrder()->first();
-        $user = DB::table('users')->inRandomOrder()->first();
+        $user = User::role('Officer')->inRandomOrder()->first();
 //        Carbon is a dateTime Library built in laravel
 //        now() = gets the current date, ->year =  gets the year from a date
 //        addYear() = a method to add year to a date
@@ -33,6 +43,7 @@ class EnrollmentFactory extends Factory
                 return Student::factory()->create()->id;
             },
             'department_id' => $department->id,
+//            NOTE: CHANGE THIS TO REGISTRAR'S ID.
             'user_id' =>  $user->id,
             'section_id' => $section->id,
             'scholarship' => $scholarship,
