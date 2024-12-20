@@ -37,6 +37,9 @@ class ListEnrollments extends ListRecords
             $tabs['4th Year'] = Tab::make('4th Year')
                 ->badge(Enrollment::where('year_level', '4th Year')->count())
                 ->modifyQueryUsing(fn ($query) => $query->where('year_level', '4th Year'));
+            $tabs['trashed'] = Tab::make('Trashed')
+                ->badge(Enrollment::onlyTrashed()->count())
+                ->modifyQueryUsing(fn ($query) => $query->onlyTrashed());
         }
 
         return $tabs;

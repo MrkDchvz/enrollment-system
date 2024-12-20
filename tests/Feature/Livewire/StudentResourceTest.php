@@ -9,7 +9,9 @@ use App\Livewire\StudentResource;
 use App\Models\Student;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
+
 use Filament\Pages\Auth\Login;
+use Filament\Actions\ForceDeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
@@ -177,6 +179,7 @@ it('can soft delete a record', function () {
         'id' => $record->id,
     ]);
 });
+
 
 it('can validate required', function (string $column) {
     livewire(CreateStudent::class)

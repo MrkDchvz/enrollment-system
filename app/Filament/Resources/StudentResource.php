@@ -166,11 +166,12 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->hidden(fn($record) => $record->trashed()),
-//                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn($record) => $record->trashed()),
             ], position: ActionsPosition::BeforeColumns);
+
     }
 
     public static function getEloquentQuery(): Builder

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Enrollment extends Model
@@ -29,7 +30,7 @@ class Enrollment extends Model
     ];
 
     public function student(): BelongsTo {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class)->withTrashed();
     }
 
     public function department() : BelongsTo {
@@ -51,4 +52,10 @@ class Enrollment extends Model
     public function courses() : BelongsToMany {
         return $this->belongsToMany(Course::class);
     }
+
+    public function courseEnrollments(): HasMany {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+
 }

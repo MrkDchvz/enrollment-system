@@ -5,10 +5,13 @@ namespace App\Filament\Resources;
 use App\Enums\RegistrationStatus;
 use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
+use App\Models\Course;
 use App\Models\Department;
 use App\Models\Enrollment;
 use App\Models\Section;
 use App\Models\Student;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -32,7 +35,12 @@ class EnrollmentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(static::getDetailsFormSchema());
+            ->schema([
+                Forms\Components\Section::make()
+                ->schema(static::getDetailsFormSchema()),
+                Forms\Components\Section::make('Courses')
+                ->schema([static::getItemsRepeater()])
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -114,7 +122,9 @@ class EnrollmentResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -154,37 +164,50 @@ class EnrollmentResource extends Resource
         return [
             Forms\Components\Select::make('student_id')
                 ->label('Student Number')
-                ->relationship('student', 'student_number')
+                ->searchable()
+                ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(50)->pluck('student_number', 'id')->toArray())
+                ->getOptionLabelUsing(fn ($value): ?string => Student::find($value)?->student_number)
                 ->required()
                 ->reactive()
                 ->preload()
                 ->afterStateUpdated(function ($state, Forms\Set $set) {
-                    $set('student_name', Student::class::find($state)->full_name ?? '');
-                    $set('semester', static::getCurrentSemester());
-                    // Retrieve the latest/last enrollment of the selected student
-                    $latestEnrollment = Student::class::find($state)->enrollments()->latest()->first();
+                    if($state) {
+                        $set('student_name', Student::class::find($state)->full_name ?? '');
+                        $set('semester', static::getCurrentSemester());
+                        // Retrieve the latest/last enrollment of the selected student
+                        $latestEnrollment = Student::class::find($state)->enrollments()->latest()->first();
 
-                    if ($latestEnrollment) {
-                        $latestSemester = $latestEnrollment->semester;
-                        $latestYearLevel = $latestEnrollment->year_level;
+                        if ($latestEnrollment) {
+                            $latestSemester = $latestEnrollment->semester;
+                            $latestYearLevel = $latestEnrollment->year_level;
 
-                        $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
-                        // Assign default year level based on latest enrollment data of student
-                        // Retains the year level if the last record is on 1st semester
-                        $set('year_level', $newYearLevel);
-                        $set('registration_status', $latestEnrollment->registration_status);
-                        $set('old_new_student', 'Old Student');
-                        $set('department_id', $latestEnrollment->department_id);
+                            $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
+                            // Assign default year level based on latest enrollment data of student
+                            // Retains the year level if the last record is on 1st semester
+                            $set('year_level', $newYearLevel);
+                            $set('registration_status', $latestEnrollment->registration_status);
+                            $set('old_new_student', 'Old Student');
+                            $set('department_id', $latestEnrollment->department_id);
+                        }
+                        // Assumes that the student is a new first year student
+                        else {
+                            $set('old_new_student', 'New Student');
+                            $set('year_level', "1st Year");
+                            $set('registration_status', 'REGULAR');
+                        }
+
+
+                    } else {
+                        $set('student_name', '');
+                        $set('semester', '');
+                        $set('year_level', '');
+                        $set('registration_status', '');
+                        $set('old_new_student', '');
+                        $set('department_id', null);
                     }
-                    // Assumes that the student is a new first year student
-                    else {
-                        $set('old_new_student', 'New Student');
-                        $set('year_level', "1st Year");
-                        $set('registration_status', 'REGULAR');
-                    }
+
 
                 })
-                ->searchable()
                 ->native(false),
 
             Forms\Components\TextInput::make('student_name')
@@ -226,19 +249,82 @@ class EnrollmentResource extends Resource
             Forms\Components\TextInput::make('school_year')
             ->label('School Year')
             ->default(static::generateCurrentSchoolYear())
-            ->disabled()
-            ->dehydrated()
+            ->readOnly()
+            ->dehydrated(false)
             ->required(),
             Forms\Components\TextInput::make('old_new_student')
             ->label('Old/New Student')
-            ->disabled()
-            ->dehydrated(),
+            ->readOnly()
+            ->dehydrated(false)
+            ->required(),
             Forms\Components\Select::make('department_id')
                 ->label('Department')
-                ->options(Department::all()->pluck('department_code', 'id')),
+                ->options(Department::all()->pluck('department_code', 'id'))
+                ->required(),
         ];
 
     }
+
+    public static function getItemsRepeater(): TableRepeater {
+        return TableRepeater::make('courseEnrollments')
+            ->headers([
+                Header::make('Course Code')
+                    ->markAsRequired(),
+                Header::make('Course Description'),
+                Header::make('Lec Units'),
+                Header::make('Lab Units'),
+            ])
+            ->streamlined()
+            ->relationship()
+            ->schema([
+                Forms\Components\Select::make('course_id')
+                ->label('Course')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, Forms\set $set) {
+                        if($state) {
+                            $set('course_name', Course::find($state)->course_name ?? '');
+                            $set('lecture_units', Course::find($state)->lecture_units ?? '');
+                            $set('lab_units', Course::find($state)->lab_units ?? '');
+                        }
+                    } )
+                    ->options(Course::all()->pluck('course_code', 'id'))
+                    ->columnSpan([
+                        'md' => 2,
+                    ]),
+                Forms\Components\TextInput::make('course_name')
+                    ->label('Course Description')
+                    ->disabled()
+                    ->dehydrated()
+                    ->columnSpan([
+                        'md' => 6,
+                    ]),
+                Forms\Components\TextInput::make('lecture_units')
+                ->label('Lec Units')
+                ->disabled()
+                ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+                Forms\Components\TextInput::make('lab_units')
+                ->label('Lab Units')
+                ->disabled()
+                ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+            ])
+
+            ->columns([
+                'md' => 10,
+            ])
+            ->addActionLabel('Add course')
+            ->hiddenLabel()
+            ->defaultItems(0);
+    }
+
 
     public static function generateCurrentSchoolYear() : string {
         $currentYear = Carbon::now()->year;

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('lab_units')->nullable();
             $table->integer('lecture_hours');
             $table->integer('lab_hours')->nullable();
+            $table->enum('program' ,['CS','IT'])->nullable();
             $table->enum('semester',['1st Semester','2nd Semester']);
             $table->enum('year_level',['1st Year','2nd Year', '3rd Year', '4th Year']);
             $table->timestamps();
