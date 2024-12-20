@@ -154,37 +154,50 @@ class EnrollmentResource extends Resource
         return [
             Forms\Components\Select::make('student_id')
                 ->label('Student Number')
-                ->relationship('student', 'student_number')
+                ->searchable()
+                ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(50)->pluck('student_number', 'id')->toArray())
+                ->getOptionLabelUsing(fn ($value): ?string => Student::find($value)?->student_number)
                 ->required()
                 ->reactive()
                 ->preload()
                 ->afterStateUpdated(function ($state, Forms\Set $set) {
-                    $set('student_name', Student::class::find($state)->full_name ?? '');
-                    $set('semester', static::getCurrentSemester());
-                    // Retrieve the latest/last enrollment of the selected student
-                    $latestEnrollment = Student::class::find($state)->enrollments()->latest()->first();
+                    if($state) {
+                        $set('student_name', Student::class::find($state)->full_name ?? '');
+                        $set('semester', static::getCurrentSemester());
+                        // Retrieve the latest/last enrollment of the selected student
+                        $latestEnrollment = Student::class::find($state)->enrollments()->latest()->first();
 
-                    if ($latestEnrollment) {
-                        $latestSemester = $latestEnrollment->semester;
-                        $latestYearLevel = $latestEnrollment->year_level;
+                        if ($latestEnrollment) {
+                            $latestSemester = $latestEnrollment->semester;
+                            $latestYearLevel = $latestEnrollment->year_level;
 
-                        $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
-                        // Assign default year level based on latest enrollment data of student
-                        // Retains the year level if the last record is on 1st semester
-                        $set('year_level', $newYearLevel);
-                        $set('registration_status', $latestEnrollment->registration_status);
-                        $set('old_new_student', 'Old Student');
-                        $set('department_id', $latestEnrollment->department_id);
+                            $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
+                            // Assign default year level based on latest enrollment data of student
+                            // Retains the year level if the last record is on 1st semester
+                            $set('year_level', $newYearLevel);
+                            $set('registration_status', $latestEnrollment->registration_status);
+                            $set('old_new_student', 'Old Student');
+                            $set('department_id', $latestEnrollment->department_id);
+                        }
+                        // Assumes that the student is a new first year student
+                        else {
+                            $set('old_new_student', 'New Student');
+                            $set('year_level', "1st Year");
+                            $set('registration_status', 'REGULAR');
+                        }
+
+
+                    } else {
+                        $set('student_name', '');
+                        $set('semester', '');
+                        $set('year_level', '');
+                        $set('registration_status', '');
+                        $set('old_new_student', '');
+                        $set('department_id', null);
                     }
-                    // Assumes that the student is a new first year student
-                    else {
-                        $set('old_new_student', 'New Student');
-                        $set('year_level', "1st Year");
-                        $set('registration_status', 'REGULAR');
-                    }
+
 
                 })
-                ->searchable()
                 ->native(false),
 
             Forms\Components\TextInput::make('student_name')
@@ -226,16 +239,18 @@ class EnrollmentResource extends Resource
             Forms\Components\TextInput::make('school_year')
             ->label('School Year')
             ->default(static::generateCurrentSchoolYear())
-            ->disabled()
-            ->dehydrated()
+            ->readOnly()
+            ->dehydrated(false)
             ->required(),
             Forms\Components\TextInput::make('old_new_student')
             ->label('Old/New Student')
-            ->disabled()
-            ->dehydrated(),
+            ->readOnly()
+            ->dehydrated(false)
+            ->required(),
             Forms\Components\Select::make('department_id')
                 ->label('Department')
-                ->options(Department::all()->pluck('department_code', 'id')),
+                ->options(Department::all()->pluck('department_code', 'id'))
+                ->required(),
         ];
 
     }
