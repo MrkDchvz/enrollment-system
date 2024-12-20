@@ -58,11 +58,20 @@ class Student extends Model
         //    Soft Delete the user associated with the soft-deleted student.
         static::deleting(function($student) {
             $student->user->delete();
+            $student->enrollments()->delete();
+
         });
-        //    Restore the user associated when restoring a  student.
+        //    Restore the user associated when restoring a  student
         static::restoring(function($student) {
             $student->user->restore();
+            $student->enrollments()->restore();
         });
+//        Force Delete the user and all of its associated enrollments when force deleting a student
+        static::forceDeleted(function($student) {
+            $student->user->forceDelete();
+            $student->enrollments()->forceDelete();
+        });
+
 
     }
 

@@ -5,10 +5,13 @@ namespace App\Filament\Resources;
 use App\Enums\RegistrationStatus;
 use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
+use App\Models\Course;
 use App\Models\Department;
 use App\Models\Enrollment;
 use App\Models\Section;
 use App\Models\Student;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -32,7 +35,12 @@ class EnrollmentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(static::getDetailsFormSchema());
+            ->schema([
+                Forms\Components\Section::make()
+                ->schema(static::getDetailsFormSchema()),
+//                Forms\Components\Section::make('Courses')
+//                ->schema([static::getItemsRepeater()])
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -114,7 +122,9 @@ class EnrollmentResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -254,6 +264,27 @@ class EnrollmentResource extends Resource
         ];
 
     }
+
+    public static function getItemsRepeater(): TableRepeater {
+        return TableRepeater::make('courseEnrollment')
+            ->headers([
+                Header::make('Course Code')
+                    ->markAsRequired(),
+                Header::make('Course Description'),
+                Header::make('Lec Units'),
+                Header::make('Lab Units'),
+            ])
+            ->streamlined()
+            ->relationship()
+            ->schema([
+                Forms\Components\Select::make('course_id')
+                ->label('Course')
+                    ->getSearchResultsUsing(fn (string $search): array => Course::where('course_code', 'like', "%{$search}%")->limit(50)->pluck('course_code', 'id')->toArray())
+                    ->getOptionLabelUsing(fn ($value): ?string => Course::find($value)?->course_code)
+
+            ]);
+    }
+
 
     public static function generateCurrentSchoolYear() : string {
         $currentYear = Carbon::now()->year;
