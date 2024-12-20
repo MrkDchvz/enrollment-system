@@ -181,24 +181,6 @@ it('can soft delete a record', function () {
 });
 
 
-//it('can force delete posts', function () {
-//    $this->actingAsAdmin();
-//    $student = Student::factory()->create();
-//
-//    $student->delete();
-//
-//    livewire(ListStudents::class, [
-//        'activeTab' => 'Trashed',
-//    ])
-//        ->assertTableActionExists('forceDelete')
-//        ->callTableAction('forceDelete', $student);
-//
-//    $this->assertModelMissing($student);
-//});
-
-
-
-
 it('can validate required', function (string $column) {
     livewire(CreateStudent::class)
         ->fillForm([$column => null])

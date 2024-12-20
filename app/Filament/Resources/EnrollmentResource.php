@@ -38,8 +38,8 @@ class EnrollmentResource extends Resource
             ->schema([
                 Forms\Components\Section::make()
                 ->schema(static::getDetailsFormSchema()),
-//                Forms\Components\Section::make('Courses')
-//                ->schema([static::getItemsRepeater()])
+                Forms\Components\Section::make('Courses')
+                ->schema([static::getItemsRepeater()])
             ]);
     }
 
@@ -266,7 +266,7 @@ class EnrollmentResource extends Resource
     }
 
     public static function getItemsRepeater(): TableRepeater {
-        return TableRepeater::make('courseEnrollment')
+        return TableRepeater::make('courseEnrollments')
             ->headers([
                 Header::make('Course Code')
                     ->markAsRequired(),
@@ -279,10 +279,50 @@ class EnrollmentResource extends Resource
             ->schema([
                 Forms\Components\Select::make('course_id')
                 ->label('Course')
-                    ->getSearchResultsUsing(fn (string $search): array => Course::where('course_code', 'like', "%{$search}%")->limit(50)->pluck('course_code', 'id')->toArray())
-                    ->getOptionLabelUsing(fn ($value): ?string => Course::find($value)?->course_code)
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, Forms\set $set) {
+                        if($state) {
+                            $set('course_name', Course::find($state)->course_name ?? '');
+                            $set('lecture_units', Course::find($state)->lecture_units ?? '');
+                            $set('lab_units', Course::find($state)->lab_units ?? '');
+                        }
+                    } )
+                    ->options(Course::all()->pluck('course_code', 'id'))
+                    ->columnSpan([
+                        'md' => 2,
+                    ]),
+                Forms\Components\TextInput::make('course_name')
+                    ->label('Course Description')
+                    ->disabled()
+                    ->dehydrated()
+                    ->columnSpan([
+                        'md' => 6,
+                    ]),
+                Forms\Components\TextInput::make('lecture_units')
+                ->label('Lec Units')
+                ->disabled()
+                ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+                Forms\Components\TextInput::make('lab_units')
+                ->label('Lab Units')
+                ->disabled()
+                ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+            ])
 
-            ]);
+            ->columns([
+                'md' => 10,
+            ])
+            ->addActionLabel('Add course')
+            ->hiddenLabel()
+            ->defaultItems(0);
     }
 
 
