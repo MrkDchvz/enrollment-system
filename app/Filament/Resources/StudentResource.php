@@ -342,6 +342,7 @@ class StudentResource extends Resource
                     ->required()
                     ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('course_name', \App\Models\Course::find($state)?->course_name ?? ''))
                     ->reactive()
+                    ->distinct()
                     ->searchable()
                     ->columnSpan([
                         'md' => 2,
