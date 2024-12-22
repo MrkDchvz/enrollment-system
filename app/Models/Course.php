@@ -17,8 +17,6 @@ class Course extends Model
         'lab_units',
         'lecture_hours',
         'lab_hours',
-        'semester',
-        'year_level'
     ];
 
 
@@ -28,5 +26,9 @@ class Course extends Model
 
     public function enrollment(): belongsToMany {
         return $this->belongsToMany(Enrollment::class);
+    }
+
+    public function populators() : HasMany {
+        return $this->hasMany(Populator::class);
     }
 }

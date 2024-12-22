@@ -353,10 +353,18 @@ class EnrollmentResource extends Resource
         }
     }
 
-    public static function populateCourse($semester, $departmentCode, $yearLevel) : array {
-
-
-    }
+//    public static function populateCourse($semester, $departmentCode, $yearLevel) : array {
+//        $courses = Course::where(function ($query) use ($departmentCode) {
+//            $query->where('program', $departmentCode)
+//                ->orWhere('program', null);
+//        })
+//            ->where('semester', $semester)
+//            ->where('year_level', $yearLevel);
+//        if ($departmentCode == 'BSIT' && $yearLevel == '2nd Year' && $semester == '1st Semester') {
+//
+//        }
+//
+//    }
 
 
 

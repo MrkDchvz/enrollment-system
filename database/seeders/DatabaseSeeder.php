@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             FeeSeeder::class,
             CourseSeeder::class,
             RoleSeeder::class,
+            PopulatorSeeder::class,
         ]);
 
         Instructor::factory()->count(10)->create();
