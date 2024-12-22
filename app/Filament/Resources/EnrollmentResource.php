@@ -353,5 +353,12 @@ class EnrollmentResource extends Resource
         }
     }
 
+    public static function populateCourse($semester, $departmentCode, $yearLevel) : array {
+
+
+    }
+
+
+
 
 }
