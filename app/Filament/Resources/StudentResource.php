@@ -297,7 +297,7 @@ class StudentResource extends Resource
                     ->prefix('+63')
                     ->telRegex('/^9\d{9}$/')
                     // Removed Users as table here Check for bugs
-                    ->unique()
+                    ->unique(ignoreRecord: true)
                     ->placeholder("9171234567")
                     ->required(),
             ]),
@@ -342,6 +342,7 @@ class StudentResource extends Resource
                     ->required()
                     ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('course_name', \App\Models\Course::find($state)?->course_name ?? ''))
                     ->reactive()
+                    ->distinct()
                     ->searchable()
                     ->columnSpan([
                         'md' => 2,
