@@ -156,7 +156,7 @@ class PopulatorSeeder extends Seeder
             ['course_id' => $courseMapping['COSC 200B'], 'semester' => '2nd Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
 
             // BSIT 4TH YEAR, 2ND SEM SUBJECTS
-            ['course_id' => $courseMapping['ITEC 199'], 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
+            ['course_id' => $courseMapping['ITEC 199'], 'semester' => '2nd Semester', 'year_level' => '4th Year', 'program' => 'BSIT'],
 
             // BSCS MIDYEAR
             ['course_id' => $courseMapping['COSC 199'], 'semester' => null, 'year_level' => 'Mid Year', 'program' => 'BSCS'],
