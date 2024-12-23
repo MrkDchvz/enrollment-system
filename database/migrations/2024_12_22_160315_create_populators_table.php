@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('program' ,['BSCS','BSIT']);
             $table->enum('semester',['1st Semester','2nd Semester'])->nullable();
-            $table->enum('year_level',['1st Year','2nd Year', '3rd Year', '4th Year'])->nullable();
+            $table->enum('year_level',['1st Year','2nd Year', '3rd Year', '4th Year', 'Mid Year'])->nullable();
         });
     }
 

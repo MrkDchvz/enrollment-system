@@ -58,82 +58,99 @@ class CourseSeeder extends Seeder
 //
             // 2nd Semester, 2nd Year
             //BSCS & BSIT
-//            ['course_code' => 'GNED 08', 'course_name' => 'Understanding the Self', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'DCIT 25', 'course_name' => 'Data Structures and Algorithms', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'DCIT 55', 'course_name' => 'Advanced Database Management System', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'FITT 4', 'course_name' => 'Physical Activities towards Health and Fitness 2', 'lecture_units' => 2, 'lab_units' => 0, 'lecture_hours' => 2, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-            //BSCS
-//            ['course_code' => 'MATH 02', 'course_name' => 'Calculus', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 65', 'course_name' => 'Architecture and Organization', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 70', 'course_name' => 'Software Engineering I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-            //BSIT
-//            ['course_code' => 'ITEC 60', 'course_name' => 'Integrated Progamming and Technologies I', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 65', 'course_name' => 'Open Source Technology', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 70', 'course_name' => 'Multimedia Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => 'GNED 08', 'course_name' => 'Understanding the Self', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'DCIT 25', 'course_name' => 'Data Structures and Algorithms', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'DCIT 55', 'course_name' => 'Advanced Database Management System', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'FITT 4', 'course_name' => 'Physical Activities towards Health and Fitness 2', 'lecture_units' => 2, 'lab_units' => 0, 'lecture_hours' => 2, 'lab_hours' => 0],
 
+            //BSCS
+            ['course_code' => 'MATH 02', 'course_name' => 'Calculus', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 65', 'course_name' => 'Architecture and Organization', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 70', 'course_name' => 'Software Engineering I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+
+            //BSIT
+            ['course_code' => 'ITEC 60', 'course_name' => 'Integrated Programming and Technologies I', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 65', 'course_name' => 'Open Source Technology', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 70', 'course_name' => 'Multimedia Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
 
 //            // 1st Semester, 3rd Year
             // BSCS & BSIT
-//            ['course_code' => 'DCIT 26', 'course_name' => 'Applications Dev\'t and Emerging Technologies', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => null],
+            ['course_code' => 'DCIT 26', 'course_name' => 'Applications Dev\'t and Emerging Technologies', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
             // BSCS
-//            ['course_code' => 'MATH 3', 'course_name' => 'Linear Algebra', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 75', 'course_name' => 'Software Engineering II', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 80', 'course_name' => 'Operating Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COCS 101', 'course_name' => 'CS Elective 1 (Computer Graphics and Visual Computing)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 85', 'course_name' => 'Networks and Communication', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
+            ['course_code' => 'MATH 3', 'course_name' => 'Linear Algebra', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 75', 'course_name' => 'Software Engineering II', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 80', 'course_name' => 'Operating Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COCS 101', 'course_name' => 'CS Elective 1 (Computer Graphics and Visual Computing)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 85', 'course_name' => 'Networks and Communication', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
             // BSIT
-//            ['course_code' => 'ITEC 90', 'course_name' => 'Network Fundamentals', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'INSY 55', 'course_name' => 'System Analysis and Design', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
+            ['course_code' => 'ITEC 90', 'course_name' => 'Network Fundamentals', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'INSY 55', 'course_name' => 'System Analysis and Design', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+
 
 
 //
 //            // 2nd Semester, 3rd Year
             // BSCS & BSIT
-//            ['course_code' => 'GNED 09', 'course_name' => 'Life and Works of Rizal', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => null],
+            ['course_code' => 'GNED 09', 'course_name' => 'Life and Works of Rizal', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
             // BSCS
-//            ['course_code' => 'MATH 4', 'course_name' => 'Experimental Statistics', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 90', 'course_name' => 'Design and Analysis of Algorithm', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 95', 'course_name' => 'Programming Languages', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 106', 'course_name' => 'CS Elective 2 (Introduction to Game Development)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 199', 'course_name' => 'Practicum (240 Hours)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSCS'],
+            ['course_code' => 'MATH 4', 'course_name' => 'Experimental Statistics', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 90', 'course_name' => 'Design and Analysis of Algorithm', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 95', 'course_name' => 'Programming Languages', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 106', 'course_name' => 'CS Elective 2 (Introduction to Game Development)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+
             // BSIT
-//            ['course_code' => 'ITEC 95', 'course_name' => 'Quantitative Methods (Modeling & Simulation)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 101', 'course_name' => 'IT ELECTIVE 1 (Human Computer Interaction 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 106', 'course_name' => 'IT ELECTIVE 2 (Web System and Technologies 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 100', 'course_name' => 'Information Assurance and Security 2', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 200A', 'course_name' => 'Captstone Project and Research 1', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
+            ['course_code' => 'ITEC 95', 'course_name' => 'Quantitative Methods (Modeling & Simulation)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'ITEC 101', 'course_name' => 'IT ELECTIVE 1 (Human Computer Interaction 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 106', 'course_name' => 'IT ELECTIVE 2 (Web System and Technologies 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 100', 'course_name' => 'Information Assurance and Security 2', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 200A', 'course_name' => 'Captstone Project and Research 1', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
 
 
 //            // 1st Semester, 4th Year
             // BSCS
-//            ['course_code' => 'COSC 100', 'course_name' => 'Automata Theory and Formal Languages', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '1st Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 105', 'course_name' => 'Intelligent Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 111', 'course_name' => 'CS Elective 3(Internet of Things)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '1st Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 200A', 'course_name' => 'Undergraduate Thesis I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 1, 'lab_hours' => 0, 'semester' => '1st Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
+            ['course_code' => 'COSC 100', 'course_name' => 'Automata Theory and Formal Languages', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 105', 'course_name' => 'Intelligent Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 111', 'course_name' => 'CS Elective 3(Internet of Things)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 200A', 'course_name' => 'Undergraduate Thesis I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 1, 'lab_hours' => 0],
+
+
+
             // BSIT
-//            ['course_code' => 'ITEC 111', 'course_name' => 'IT ELECTIVE 3 (Integrated Programming and Technologies 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 116', 'course_name' => 'IT ELECTIVE 4 (Systems Integration and Architecture 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 110', 'course_name' => 'Systems Administration and Maintenance', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 200B', 'course_name' => 'Capstone Project and Research 2', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
-//
+            ['course_code' => 'ITEC 111', 'course_name' => 'IT ELECTIVE 3 (Integrated Programming and Technologies 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 116', 'course_name' => 'IT ELECTIVE 4 (Systems Integration and Architecture 2)', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 110', 'course_name' => 'Systems Administration and Maintenance', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 200B', 'course_name' => 'Capstone Project and Research 2', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
 
 
 
-//
+
+
 //            // 2nd Semester, 4th Year
 
             // BSCS
-//            ['course_code' => 'COSC 110', 'course_name' => 'Numerical and Symbolic Computation', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 200B', 'course_name' => 'Undergraduate Thesis II', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 1, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '4th Year', 'program' => 'BSCS'],
+
+            ['course_code' => 'COSC 110', 'course_name' => 'Numerical and Symbolic Computation', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 200B', 'course_name' => 'Undergraduate Thesis II', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 1, 'lab_hours' => 0],
+//             BSIT
+            ['course_code' => 'ITEC 199', 'course_name' => 'Practicum (486 Hours)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+
+
+
+            // MID YEAR
+            // BSCS
+            ['course_code' => 'COSC 199', 'course_name' => 'Practicum (240 Hours)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
             // BSIT
-//            ['course_code' => 'ITEC 199', 'course_name' => 'Practicum (486 Hours)', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '3rd Year', 'program' => 'BSIT'],
+            ['course_code' => 'STAT 2', 'course_name' => 'Applied Statistics', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'ITEC 75', 'course_name' => 'System Integration and Architecture 1', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+
+
 
 //            SPECIAL COURSES: Courses that are present in both BSCS and BSIT but is taken on different year and/or different semester
             ['course_code' => 'GNED 14', 'course_name' => 'Panitikan Panlipunan', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
-//            ['course_code' => 'DCIT 65', 'course_name' => 'Social and Professional Issues', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => null, 'year_level' => null, 'program' => null],
-//            ['course_code' => 'DCIT 60', 'course_name' => 'Methods of Research', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => null, 'year_level' => null, 'program' => null],
-//            ['course_code' => 'ITEC 85', 'course_name' => 'Information Assurance and Security', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => null, 'year_level' => null, 'program' => null],
-//            ['course_code' => 'ITEC 80', 'course_name' => 'Human Computer Interaction', 'lecture_units' => 1, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => null, 'year_level' => null, 'program' => null],
+            ['course_code' => 'DCIT 65', 'course_name' => 'Social and Professional Issues', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'DCIT 60', 'course_name' => 'Methods of Research', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'ITEC 85', 'course_name' => 'Information Assurance and Security', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'ITEC 80', 'course_name' => 'Human Computer Interaction', 'lecture_units' => 1, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
             ['course_code' => 'GNED 07', 'course_name' => 'The Contemporary World', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
             ['course_code' => 'GNED 10', 'course_name' => 'Gender and Society', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
 
