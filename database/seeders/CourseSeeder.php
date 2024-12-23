@@ -58,19 +58,20 @@ class CourseSeeder extends Seeder
 //
             // 2nd Semester, 2nd Year
             //BSCS & BSIT
-//            ['course_code' => 'GNED 08', 'course_name' => 'Understanding the Self', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'DCIT 25', 'course_name' => 'Data Structures and Algorithms', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'DCIT 55', 'course_name' => 'Advanced Database Management System', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-//            ['course_code' => 'FITT 4', 'course_name' => 'Physical Activities towards Health and Fitness 2', 'lecture_units' => 2, 'lab_units' => 0, 'lecture_hours' => 2, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => null],
-            //BSCS
-//            ['course_code' => 'MATH 02', 'course_name' => 'Calculus', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 65', 'course_name' => 'Architecture and Organization', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-//            ['course_code' => 'COSC 70', 'course_name' => 'Software Engineering I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
-            //BSIT
-//            ['course_code' => 'ITEC 60', 'course_name' => 'Integrated Progamming and Technologies I', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 65', 'course_name' => 'Open Source Technology', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
-//            ['course_code' => 'ITEC 70', 'course_name' => 'Multimedia Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3, 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => 'GNED 08', 'course_name' => 'Understanding the Self', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'DCIT 25', 'course_name' => 'Data Structures and Algorithms', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'DCIT 55', 'course_name' => 'Advanced Database Management System', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'FITT 4', 'course_name' => 'Physical Activities towards Health and Fitness 2', 'lecture_units' => 2, 'lab_units' => 0, 'lecture_hours' => 2, 'lab_hours' => 0],
 
+            //BSCS
+            ['course_code' => 'MATH 02', 'course_name' => 'Calculus', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+            ['course_code' => 'COSC 65', 'course_name' => 'Architecture and Organization', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'COSC 70', 'course_name' => 'Software Engineering I', 'lecture_units' => 3, 'lab_units' => 0, 'lecture_hours' => 3, 'lab_hours' => 0],
+
+            //BSIT
+            ['course_code' => 'ITEC 60', 'course_name' => 'Integrated Programming and Technologies I', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 65', 'course_name' => 'Open Source Technology', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
+            ['course_code' => 'ITEC 70', 'course_name' => 'Multimedia Systems', 'lecture_units' => 2, 'lab_units' => 1, 'lecture_hours' => 2, 'lab_hours' => 3],
 
 //            // 1st Semester, 3rd Year
             // BSCS & BSIT

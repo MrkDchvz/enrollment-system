@@ -6,6 +6,7 @@ use App\Enums\RegistrationStatus;
 use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
 use App\Models\Course;
+use App\Models\CourseEnrollment;
 use App\Models\Department;
 use App\Models\Enrollment;
 use App\Models\Section;
@@ -40,6 +41,7 @@ class EnrollmentResource extends Resource
                 ->schema(static::getDetailsFormSchema()),
                 Forms\Components\Section::make('Courses')
                 ->schema([static::getItemsRepeater()])
+                ->columnSpan('full'),
             ]);
     }
 
@@ -170,7 +172,7 @@ class EnrollmentResource extends Resource
                 ->required()
                 ->reactive()
                 ->preload()
-                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
                     if($state) {
                         $set('student_name', Student::class::find($state)->full_name ?? '');
                         $set('semester', static::getCurrentSemester());
@@ -181,6 +183,8 @@ class EnrollmentResource extends Resource
                             $latestSemester = $latestEnrollment->semester;
                             $latestYearLevel = $latestEnrollment->year_level;
 
+
+                            // If the last/latest enrollment is 2nd semester move the year level up by 1
                             $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
                             // Assign default year level based on latest enrollment data of student
                             // Retains the year level if the last record is on 1st semester
@@ -188,6 +192,12 @@ class EnrollmentResource extends Resource
                             $set('registration_status', $latestEnrollment->registration_status);
                             $set('old_new_student', 'Old Student');
                             $set('department_id', $latestEnrollment->department_id);
+
+                            $set('courseEnrollments', static::populateCourse(
+                                $latestSemester,
+                                $latestEnrollment->department_id,
+                                $latestYearLevel
+                            ));
                         }
                         // Assumes that the student is a new first year student
                         else {
@@ -195,6 +205,12 @@ class EnrollmentResource extends Resource
                             $set('year_level', "1st Year");
                             $set('registration_status', 'REGULAR');
                         }
+                        $sampleCourse = Course::find(1)->first();
+
+//                        dd(Course::find(1)->first()->course_code)
+
+
+
 
 
                     } else {
@@ -233,7 +249,15 @@ class EnrollmentResource extends Resource
                     '4th Year' => 'danger',
                 ])
                 ->inline()
-                ->required(),
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
+                    $set('courseEnrollments', static::populateCourse(
+                        $get('semester'),
+                        $get('department_id'),
+                        $get('year_level')
+                    ));
+                }),
             Forms\Components\ToggleButtons::make('semester')
             ->label('Semester')
             ->options([
@@ -245,7 +269,15 @@ class EnrollmentResource extends Resource
                 '2nd Semester' => 'success',
                 ])
             ->inline()
-            ->required(),
+            ->required()
+            ->reactive()
+            ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
+                    $set('courseEnrollments', static::populateCourse(
+                            $get('semester'),
+                            $get('department_id'),
+                            $get('year_level')
+                    ));
+            }),
             Forms\Components\TextInput::make('school_year')
             ->label('School Year')
             ->default(static::generateCurrentSchoolYear())
@@ -260,7 +292,15 @@ class EnrollmentResource extends Resource
             Forms\Components\Select::make('department_id')
                 ->label('Department')
                 ->options(Department::all()->pluck('department_code', 'id'))
-                ->required(),
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
+                    $set('courseEnrollments', static::populateCourse(
+                        $get('semester'),
+                        $get('department_id'),
+                        $get('year_level')
+                    ));
+                }),
         ];
 
     }
@@ -270,9 +310,16 @@ class EnrollmentResource extends Resource
             ->headers([
                 Header::make('Course Code')
                     ->markAsRequired(),
-                Header::make('Course Description'),
-                Header::make('Lec Units'),
-                Header::make('Lab Units'),
+                Header::make('Course Description')
+                ->width('40%'),
+                Header::make('Lecture Units')
+                ->width('10%'),
+                Header::make('Lab Units')
+                ->width('10%'),
+                Header::make('Lecture Hours')
+                    ->width('10%'),
+                Header::make('Lab Hours')
+                    ->width('10%'),
             ])
             ->streamlined()
             ->relationship()
@@ -281,48 +328,69 @@ class EnrollmentResource extends Resource
                 ->label('Course')
                     ->searchable()
                     ->preload()
+                    ->placeholder('Select Course')
                     ->required()
                     ->reactive()
+                    ->distinct()
                     ->afterStateUpdated(function ($state, Forms\set $set) {
-                        if($state) {
+                        if(!empty($state)) {
                             $set('course_name', Course::find($state)->course_name ?? '');
                             $set('lecture_units', Course::find($state)->lecture_units ?? '');
                             $set('lab_units', Course::find($state)->lab_units ?? '');
+                            $set('lecture_hours', Course::find($state)->lecture_hours ?? '');
+                            $set('lab_hours', Course::find($state)->lab_hours ?? '');
+                        } else {
+                            $set('course_name', '');
+                            $set('lecture_units', '');
+                            $set('lab_units', '');
                         }
                     } )
                     ->options(Course::all()->pluck('course_code', 'id'))
                     ->columnSpan([
-                        'md' => 2,
+                        'md' => 2
                     ]),
                 Forms\Components\TextInput::make('course_name')
                     ->label('Course Description')
                     ->disabled()
                     ->dehydrated()
                     ->columnSpan([
-                        'md' => 6,
+                        'md' => 4
                     ]),
                 Forms\Components\TextInput::make('lecture_units')
-                ->label('Lec Units')
-                ->disabled()
-                ->dehydrated()
+                    ->label('Lec')
+                    ->disabled()
+                    ->dehydrated()
                     ->columnSpan([
-                        'md' => 1,
+                        'md' => 1
                     ]),
                 Forms\Components\TextInput::make('lab_units')
-                ->label('Lab Units')
-                ->disabled()
-                ->dehydrated()
+                    ->label('Lab')
+                    ->disabled()
+                    ->dehydrated()
                     ->columnSpan([
-                        'md' => 1,
+                        'md' => 1
+                    ]),
+                Forms\Components\TextInput::make('lecture_hours')
+                    ->label('Lec')
+                    ->disabled()
+                    ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1
+                    ]),
+                Forms\Components\TextInput::make('lab_hours')
+                    ->label('Lec')
+                    ->disabled()
+                    ->dehydrated()
+                    ->columnSpan([
+                        'md' => 1
                     ]),
             ])
-
-            ->columns([
-                'md' => 10,
-            ])
-            ->addActionLabel('Add course')
-            ->hiddenLabel()
-            ->defaultItems(0);
+                ->addActionLabel('Add course')
+                ->hiddenLabel()
+                ->columns([
+                    'md' => 10
+                ])
+                ->defaultItems(0);
     }
 
 
@@ -353,18 +421,24 @@ class EnrollmentResource extends Resource
         }
     }
 
-//    public static function populateCourse($semester, $departmentCode, $yearLevel) : array {
-//        $courses = Course::where(function ($query) use ($departmentCode) {
-//            $query->where('program', $departmentCode)
-//                ->orWhere('program', null);
-//        })
-//            ->where('semester', $semester)
-//            ->where('year_level', $yearLevel);
-//        if ($departmentCode == 'BSIT' && $yearLevel == '2nd Year' && $semester == '1st Semester') {
-//
-//        }
-//
-//    }
+    public static function populateCourse($semester, $departmentId, $yearLevel) : array {
+        $courses = [];
+        if (!empty($semester) && !empty($departmentId) && !empty($yearLevel)) {
+            $departmentCode = Department::find($departmentId)->department_code;
+            $courses = Course::selectRaw('id as course_id, course_name, lecture_units, lab_units, lecture_hours, lab_hours')
+                ->whereHas('populators', function ($query) use ($semester, $departmentCode, $yearLevel) {
+                    $query
+                        ->where('semester', $semester)
+                        ->where('program', $departmentCode)
+                        ->where('year_level', $yearLevel);
+                })
+//            ->with('populators')
+                ->get()
+                ->toArray();
+        }
+
+        return $courses;
+    }
 
 
 

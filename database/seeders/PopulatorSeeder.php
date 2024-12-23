@@ -82,10 +82,36 @@ class PopulatorSeeder extends Seeder
             ['course_id' => $courseMapping['GNED 14'], 'semester' => '1st Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
             ['course_id' => $courseMapping['ITEC 55'], 'semester' => '1st Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
 
-
-            ]);
-
             // BSCS 2ND YEAR, 2ND SEM SUBJECTS
+            ['course_code' => $courseMapping['GNED 08'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['DCIT 25'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['DCIT 55'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['FITT 4'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_id' => $courseMapping['GNED 14'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['MATH 02'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['COSC 65'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+            ['course_code' => $courseMapping['COSC 70'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSCS'],
+
+            // BSIT 2ND YEAR, 2ND SEM SUBJECTS
+            ['course_code' => $courseMapping['GNED 08'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['DCIT 25'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['DCIT 55'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['FITT 4'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['ITEC 60'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['ITEC 65'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+            ['course_code' => $courseMapping['ITEC 70'], 'semester' => '2nd Semester', 'year_level' => '2nd Year', 'program' => 'BSIT'],
+
+            // BSCS MIDYEAR
+
+            // BSIT MIDYEAR
+
+
+
+        ]);
+
+
+
+
 
 
 
