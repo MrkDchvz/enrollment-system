@@ -57,5 +57,9 @@ class Enrollment extends Model
         return $this->hasMany(CourseEnrollment::class);
     }
 
+    public function enrollmentFees () : HasMany {
+        return $this->hasMany(EnrollmentFee::class);
+    }
+
 
 }
