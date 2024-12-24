@@ -171,14 +171,17 @@ class EnrollmentResource extends Resource
                 Forms\Components\Select::make('student_id')
                     ->label('Student Number')
                     ->searchable()
-                    ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(50)->pluck('student_number', 'id')->toArray())
+                    ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(5)->pluck('student_number', 'id')->toArray())
                     ->getOptionLabelUsing(fn ($value): ?string => Student::find($value)?->student_number)
                     ->required()
                     ->reactive()
                     ->preload()
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
                         if($state) {
+                            // Default Values
                             $currentSemester =  static::getCurrentSemester();
+                            $newYearLevel = "1st Year";
+                            // Initialize read-only fields
                             $set('student_name', Student::class::find($state)->full_name ?? '');
                             $set('semester', $currentSemester);
 
@@ -193,7 +196,7 @@ class EnrollmentResource extends Resource
                                 $lastRegistrationStatus = $lastEnrollment->registration_status;
 
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
-                                $newYearLevel = $lastSemester === "2nd Semester" ? static::incrementYearLevel($lastYearLevel) : $lastYearLevel;
+                                $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
                                 // Assign default year level based on latest enrollment data of student
                                 // Retains the year level if the last record is on 1st semester
                                 $set('year_level', $newYearLevel);
@@ -208,10 +211,11 @@ class EnrollmentResource extends Resource
                                 ));
 
                             }
-                            // Assumes that the student is a new first year student
+                            // Assumes that the student is a new first year student if last enrollment is not found
+                            // In other words if a student has no enrollment data the system will assume that the student is 1st year
                             else {
                                 $set('old_new_student', 'New Student');
-                                $set('year_level', "1st Year");
+                                $set('year_level', $newYearLevel);
                                 $set('registration_status', 'REGULAR');
                             }
                             // Autofill fees base on semester
@@ -444,14 +448,21 @@ class EnrollmentResource extends Resource
         return "{$currentYear} - {$nextYear}";
     }
 
-    public static function incrementYearLevel($latestYearLevel) : string {
+    public static function incrementYearLevel($yearLevel, $semester) : string {
         $yearLevelPipeline = [
             "1st Year" => "2nd Year",
             "2nd Year" => "3rd Year",
             "3rd Year" => "4th Year",
         ];
+        // Retains year level if its in 1st semester
+        if ($semester == "1st Semester") {
+            return $yearLevel;
+        } else {
+            // advances year level by 1 if its 2nd semester
+            // If its 4th year retain year
+            return $yearLevelPipeline[$yearLevel] ?? $yearLevel;
+        }
 
-        return $yearLevelPipeline[$latestYearLevel] ?? $latestYearLevel;
     }
 
     public static function getCurrentSemester() : string {
