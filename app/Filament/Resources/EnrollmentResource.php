@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 class EnrollmentResource extends Resource
@@ -177,30 +178,35 @@ class EnrollmentResource extends Resource
                     ->preload()
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
                         if($state) {
+                            $currentSemester =  static::getCurrentSemester();
                             $set('student_name', Student::class::find($state)->full_name ?? '');
-                            $set('semester', static::getCurrentSemester());
+                            $set('semester', $currentSemester);
+
                             // Retrieve the latest/last enrollment of the selected student
-                            $latestEnrollment = Student::class::find($state)->enrollments()->latest()->first();
+                            $lastEnrollment = Student::class::find($state)->enrollments()->latest()->first();
 
-                            if ($latestEnrollment) {
-                                $latestSemester = $latestEnrollment->semester;
-                                $latestYearLevel = $latestEnrollment->year_level;
-
+                            if ($lastEnrollment) {
+                                // This is used to calculate the newyearlevel ONLY
+                                $lastSemester = $lastEnrollment->semester;
+                                $lastYearLevel = $lastEnrollment->year_level;
+                                $lastDepartment = $lastEnrollment->department_id;
+                                $lastRegistrationStatus = $lastEnrollment->registration_status;
 
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
-                                $newYearLevel = $latestSemester === "2nd Semester" ? static::incrementYearLevel($latestYearLevel) : $latestYearLevel;
+                                $newYearLevel = $lastSemester === "2nd Semester" ? static::incrementYearLevel($lastYearLevel) : $lastYearLevel;
                                 // Assign default year level based on latest enrollment data of student
                                 // Retains the year level if the last record is on 1st semester
                                 $set('year_level', $newYearLevel);
-                                $set('registration_status', $latestEnrollment->registration_status);
+                                $set('registration_status', $lastRegistrationStatus);
                                 $set('old_new_student', 'Old Student');
-                                $set('department_id', $latestEnrollment->department_id);
-
+                                $set('department_id', $lastDepartment);
+                                // Autofill courses base on Department, Year_level, and semester
                                 $set('courseEnrollments', static::populateCourse(
-                                    $latestSemester,
-                                    $latestEnrollment->department_id,
-                                    $latestYearLevel
+                                    $currentSemester,
+                                    $lastDepartment,
+                                    $newYearLevel
                                 ));
+
                             }
                             // Assumes that the student is a new first year student
                             else {
@@ -208,7 +214,8 @@ class EnrollmentResource extends Resource
                                 $set('year_level', "1st Year");
                                 $set('registration_status', 'REGULAR');
                             }
-                            $sampleCourse = Course::find(1)->first();
+                            // Autofill fees base on semester
+                            $set('enrollmentFees', static::populateFees($newYearLevel));
 
                         // clear fields if the student number is cleared
                         } else {
@@ -254,7 +261,10 @@ class EnrollmentResource extends Resource
                             $get('department_id'),
                             $get('year_level')
                         ));
+                        $set('enrollmentFees', static::populateFees($state));
+
                     }),
+
                 Forms\Components\ToggleButtons::make('semester')
                     ->label('Semester')
                     ->options([
@@ -289,7 +299,7 @@ class EnrollmentResource extends Resource
                         $get('year_level')
                     ));
                 }),
-            Forms\Components\TextInput::make('school_year')
+        Forms\Components\TextInput::make('school_year')
             ->label('School Year')
             ->default(static::generateCurrentSchoolYear())
             ->readOnly()
@@ -300,9 +310,7 @@ class EnrollmentResource extends Resource
             ->readOnly()
             ->dehydrated(false)
             ->required(),
-
         ];
-
     }
 
     public static function getCourseRepeater(): TableRepeater {
@@ -397,7 +405,7 @@ class EnrollmentResource extends Resource
             ->headers([
                 Header::make('Name')
                     ->markAsRequired(),
-                Header::make('Amount'),
+                Header::make('Amount (in Pesos)'),
             ])
             ->streamlined()
             ->relationship()
@@ -413,7 +421,7 @@ class EnrollmentResource extends Resource
                     ->afterStateUpdated(function ($state, Forms\set $set) {
                         if(!empty($state)) {
                             $amount = Fee::find($state)?->amount ?? '';
-                            $set('amount', "₱" . $amount);
+                            $set('amount', $amount);
                         } else {
                             $set('amount', '');
 
@@ -422,7 +430,6 @@ class EnrollmentResource extends Resource
                     ->options(Fee::all()->pluck('name', 'id')),
 
                 Forms\Components\TextInput::make('amount')
-                    ->label('Course Description')
                     ->readOnly(),
             ])
             ->addActionLabel('Add Fee')
@@ -476,18 +483,25 @@ class EnrollmentResource extends Resource
 
         return $courses;
     }
-
-    public static function populateFees($bool) {
+    public static function populateFees($year_level) {
         $fees = [];
-        if ($bool) {
-            $fees = Fee::all()
-            ->toArray();
-        }
-        else {
-            $fees  = Fee::selectRaw('id as fees_id, amount')
-                ->whereNot('name', 'NSTP')
-                ->get()
-                ->toArray();
+        switch ($year_level) {
+            case '1st Year':
+                $fees = Fee::selectRaw('id as fee_id, amount')
+                        ->get()
+                        ->toArray();
+                break;
+            case '3rd Year':
+            case '4th Year':
+            case '2nd Year':
+                $fees  = Fee::selectRaw('id as fee_id, amount')
+                    ->whereNot('name', 'NSTP')
+                    ->get()
+                    ->toArray();
+                break;
+            default:
+                throw new InvalidArgumentException("Invalid year level: $year_level");
+                break;
         }
         return $fees;
     }

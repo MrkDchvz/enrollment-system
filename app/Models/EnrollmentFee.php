@@ -14,7 +14,7 @@ class EnrollmentFee extends Model
         return $this->belongsTo(Enrollment::class);
     }
 
-    public function course(): BelongsTo {
+    public function fee(): BelongsTo {
         return $this->belongsTo(Fee::class);
     }
 }
