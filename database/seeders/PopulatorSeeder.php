@@ -18,7 +18,6 @@ class PopulatorSeeder extends Seeder
         DB::table('populators')->insert([
             // BSCS 1ST YEAR, 1ST SEM SUBJECTS
 
-
             ['course_id' => $courseMapping["GNED 02"], 'semester' => '1st Semester', 'year_level' => '1st Year', 'program' => 'BSCS'],
             ['course_id' => $courseMapping["GNED 05"], 'semester' => '1st Semester', 'year_level' => '1st Year', 'program' => 'BSCS'],
             ['course_id' => $courseMapping["GNED 11"], 'semester' => '1st Semester', 'year_level' => '1st Year', 'program' => 'BSCS'],
