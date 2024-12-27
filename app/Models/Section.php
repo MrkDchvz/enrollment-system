@@ -31,8 +31,26 @@ class Section extends Model
     {
         return Attribute::make(
             get: fn ($value, $attributes) => trim(
-                "{$this->department->department_code} {$attributes['year_level']}-{$attributes['class_number']}"
+                sprintf("%s %d-%d",
+                        $this->department->department_code,
+                        preg_replace('/\D/', '', $attributes['year_level']),
+                        $attributes['class_number']
+                )
             )
         );
     }
+
+    protected function fullSectionName() : Attribute {
+        return Attribute::make(
+            get: fn ($value, $attributes) => trim(
+                sprintf("%s %d-%d %s",
+                    $this->department->department_code,
+                    preg_replace('/\D/', '', $attributes['year_level']),
+                    $attributes['class_number'],
+                    $attributes['school_year']
+                )
+            )
+        );
+    }
+
 }

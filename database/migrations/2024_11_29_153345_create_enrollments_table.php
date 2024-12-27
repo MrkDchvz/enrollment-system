@@ -19,10 +19,8 @@ return new class extends Migration
             $table->foreignId('section_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('registration_status', ['REGULAR', 'IRREGULAR']);
             $table->enum('old_new_student',['Old Student', 'New Student']);
-            $table->enum('year_level', ['1st Year', '2nd Year', '3rd Year', '4th Year']);
             $table->enum('semester', ['1st Semester', '2nd Semester']);
             $table->string('scholarship')->nullable();
-            $table->string('school_year');
             $table->date('enrollment_date');
             $table->timestamps();
             $table->softDeletes();
