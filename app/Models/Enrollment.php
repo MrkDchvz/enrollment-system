@@ -24,7 +24,6 @@ class Enrollment extends Model
         'old_new_student',
         'year_level',
         'semester',
-        'school_year',
         'enrollment_date',
         'scholarship'
     ];

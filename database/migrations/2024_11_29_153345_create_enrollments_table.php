@@ -22,7 +22,6 @@ return new class extends Migration
             $table->enum('year_level', ['1st Year', '2nd Year', '3rd Year', '4th Year']);
             $table->enum('semester', ['1st Semester', '2nd Semester']);
             $table->string('scholarship')->nullable();
-            $table->string('school_year');
             $table->date('enrollment_date');
             $table->timestamps();
             $table->softDeletes();

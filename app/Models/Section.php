@@ -35,4 +35,12 @@ class Section extends Model
             )
         );
     }
+
+    protected function fullSectionName() : Attribute {
+        return Attribute::make(
+            get: fn ($value, $attributes) => trim(
+                "{$this->department->department_code} {$attributes['year_level']}-{$attributes['class_number']} {$attributes['school_year']}"
+            )
+        );
+    }
 }

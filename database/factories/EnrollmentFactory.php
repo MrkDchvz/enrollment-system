@@ -50,7 +50,6 @@ class EnrollmentFactory extends Factory
             'registration_status' => $this->faker->randomElement(['REGULAR', 'IRREGULAR']),
             'semester' => $this->faker->randomElement(['1st Semester', '2nd Semester']),
             'year_level' => $this->faker->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
-            'school_year' => "$currentYear-$nextYear",
             'old_new_student' => $this->faker->randomElement(['Old Student', 'New Student']),
             'enrollment_date' => Carbon::now()->format('Y-m-d'),
         ];

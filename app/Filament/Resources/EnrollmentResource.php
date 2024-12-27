@@ -90,7 +90,7 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('section.sectionName')
                     ->label('Section')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('school_year')
+                Tables\Columns\TextColumn::make('section.school_year')
                     ->label('School Year')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('old_new_student')
@@ -116,7 +116,7 @@ class EnrollmentResource extends Resource
                 SelectFilter::make('school_year')
                     ->label('School Year')
                     ->options(function () {
-                        return Enrollment::select('school_year')
+                        return Section::select('school_year')
                                 ->distinct()
                                 ->pluck('school_year', 'school_year');
                     })
@@ -290,27 +290,47 @@ class EnrollmentResource extends Resource
                         ));
                     }),
             ]),
+            Forms\Components\Grid::make(3)->schema([
+                Forms\Components\Select::make('department_id')
+                    ->label('Department')
+                    ->options(Department::all()->pluck('department_code', 'id'))
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
+                        $set('courseEnrollments', static::populateCourse(
+                            $get('semester'),
+                            $get('department_id'),
+                            $get('year_level')
+                        ));
+                        $set('section_id', null);
+                    }),
+                Forms\Components\Select::make('section_id')
+                    ->label('Section')
+                    ->options(function (Forms\Get $get) {
+                        $schoolyear = static::generateCurrentSchoolYear();
+                        return Section::where('department_id', $get('department_id'))
+                            ->get()
+                            ->mapWithKeys(function ($section) {
+                                return [
+                                    $section->id => $section->sectionName
+                                ];
+                            });
+                    })
+                    ->searchable()
+                    ->disabled(fn (Forms\get $get) => !$get('department_id'))
+                    ->required(),
 
-            Forms\Components\Select::make('department_id')
-                ->label('Department')
-                ->options(Department::all()->pluck('department_code', 'id'))
-                ->required()
-                ->reactive()
-                ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
-                    $set('courseEnrollments', static::populateCourse(
-                        $get('semester'),
-                        $get('department_id'),
-                        $get('year_level')
-                    ));
-                }),
+                Forms\Components\Select::make('old_new_student')
+                    ->label('Old/New Student')
+                    ->options([
+                        'Old Student' => 'Old Student',
+                        'New Student' => 'New Student',
+                    ])
+                    ->required(),
+            ]),
         Forms\Components\TextInput::make('school_year')
             ->label('School Year')
             ->default(static::generateCurrentSchoolYear())
-            ->readOnly()
-            ->dehydrated(false)
-            ->required(),
-            Forms\Components\TextInput::make('old_new_student')
-            ->label('Old/New Student')
             ->readOnly()
             ->dehydrated(false)
             ->required(),
@@ -344,7 +364,7 @@ class EnrollmentResource extends Resource
                     ->required()
                     ->reactive()
                     ->distinct()
-                    ->afterStateUpdated(function ($state, Forms\set $set) {
+                    ->afterStateUpdated(function ($state, Forms\set $set, Forms\get $get) {
                         if(!empty($state)) {
                             $set('course_name', Course::find($state)->course_name ?? '');
                             $set('lecture_units', Course::find($state)->lecture_units ?? '');
@@ -355,6 +375,8 @@ class EnrollmentResource extends Resource
                             $set('course_name', '');
                             $set('lecture_units', '');
                             $set('lab_units', '');
+                            $set('lecture_hours', '');
+                            $set('lab_hours', '');
                         }
                     })
                     ->options(Course::all()->pluck('course_code', 'id'))
