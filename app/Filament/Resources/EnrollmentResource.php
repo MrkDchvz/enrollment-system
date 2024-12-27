@@ -27,6 +27,7 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 class EnrollmentResource extends Resource
@@ -194,6 +195,7 @@ class EnrollmentResource extends Resource
                                 $lastYearLevel = $lastEnrollment->yearLevel;
                                 $lastDepartment = $lastEnrollment->department_id;
                                 $lastRegistrationStatus = $lastEnrollment->registration_status;
+                                $lastSectionId = $lastEnrollment->section_id;
 
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
                                 $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
@@ -203,6 +205,7 @@ class EnrollmentResource extends Resource
                                 $set('registration_status', $lastRegistrationStatus);
                                 $set('old_new_student', 'Old Student');
                                 $set('department_id', $lastDepartment);
+                                $set('section_id', self::getNewSection($lastSectionId, static::generateCurrentSchoolYear()));
                                 // Autofill courses base on Department, Year_level, and semester
                                 $set('courseEnrollments', static::populateCourse(
                                     $currentSemester,
@@ -467,13 +470,7 @@ class EnrollmentResource extends Resource
     }
 
 
-    public static function generateCurrentSchoolYear() : string {
-        $currentYear = Carbon::now()->year;
-        $nextYear = Carbon::now()->addYear()->year;
-        return trim(
-            sprintf('%s-%s', $currentYear, $nextYear)
-        );
-    }
+
 
     public static function incrementYearLevel($yearLevel, $semester) : string {
         $yearLevelPipeline = [
@@ -490,6 +487,52 @@ class EnrollmentResource extends Resource
             return $yearLevelPipeline[$yearLevel] ?? $yearLevel;
         }
 
+    }
+
+    // This retuns a new section ID
+    public static function getNewSection($sectionId, $schoolYear) : int {
+        $yearLevelPipeline = [
+            "1st Year" => "2nd Year",
+            "2nd Year" => "3rd Year",
+            "3rd Year" => "4th Year",
+        ];
+
+        $section = Section::find($sectionId);
+        $classNumber = $section->class_number;
+        $departmentId = $section->department->id;
+        $yearLevel = $section->year_level;
+
+        $newSection =
+            Section::where('department_id', $departmentId)
+                ->where('year_level', $yearLevel)
+                ->where('class_number', $classNumber)
+                ->where('school_year', $schoolYear);
+        return $newSection->id;
+    }
+
+    public static function generateCurrentSchoolYear() : string {
+        // Current Date
+        $date = Carbon::now();
+        // Current Year $ Month
+        $year = $date->year;
+        $month = $date->month;
+        // Set a new school year if the enrollment is in around august
+        // If the year is 2024 and the student enrolled around august 2024
+        // Then the school year will be 2024 - 2024
+        if ($month >= 8) {
+            $startYear = $date->year;
+            $endYear = $date->year + 1;
+        }
+        // Retain the current school year if the enrollment is around february
+        // If the year is 2024 and the student enrolled around february 2024
+        // Then the school year is 2023-2024
+        else {
+            $startYear = $date->year - 1;
+            $endYear = $date->year;
+        }
+        return trim(
+            sprintf('%s-%s', $startYear, $endYear)
+        );
     }
 
     public static function getCurrentSemester() : string {

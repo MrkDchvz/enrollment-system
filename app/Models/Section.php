@@ -53,15 +53,4 @@ class Section extends Model
         );
     }
 
-    protected function yearLevelWithSuffix() : Attribute {
-        return Attribute::make(
-            get: fn ($value, $attributes) => match ($attributes['year_level']) {
-                '1' => "1st Year",
-                '2' => "2nd Year",
-                '3' => "3rd Year",
-                '4' => "4th Year",
-                    default => "Unknown Year",
-                }
-            );
-    }
 }

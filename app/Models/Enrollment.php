@@ -42,6 +42,12 @@ class Enrollment extends Model
         );
     }
 
+    protected function classNumber(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->section->class_number
+        );
+    }
+
     public function student(): BelongsTo {
         return $this->belongsTo(Student::class)->withTrashed();
     }
