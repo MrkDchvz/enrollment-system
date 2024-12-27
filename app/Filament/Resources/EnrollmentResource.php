@@ -199,13 +199,15 @@ class EnrollmentResource extends Resource
 
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
                                 $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
+                                // Get new section
+                                $newSection = Section::find(self::getNewSection($lastSectionId, $lastSemester));
                                 // Assign default year level based on latest enrollment data of student
                                 // Retains the year level if the last record is on 1st semester
                                 $set('year_level', $newYearLevel);
                                 $set('registration_status', $lastRegistrationStatus);
                                 $set('old_new_student', 'Old Student');
                                 $set('department_id', $lastDepartment);
-                                $set('section_id', self::getNewSection($lastSectionId, static::generateCurrentSchoolYear()));
+                                $set('section_id', $newSection->fullSectionName);
                                 // Autofill courses base on Department, Year_level, and semester
                                 $set('courseEnrollments', static::populateCourse(
                                     $currentSemester,
@@ -232,6 +234,8 @@ class EnrollmentResource extends Resource
                             $set('registration_status', '');
                             $set('old_new_student', '');
                             $set('department_id', null);
+                            $set('section_id', null);
+
                         }
 
                     })
@@ -269,6 +273,7 @@ class EnrollmentResource extends Resource
                             $get('year_level')
                         ));
                         $set('enrollmentFees', static::populateFees($state));
+                        // Reset section field option
                         $set('section_id', null);
 
                     }),
@@ -306,12 +311,13 @@ class EnrollmentResource extends Resource
                             $get('department_id'),
                             $get('year_level')
                         ));
+//                        // Reset section field option
                         $set('section_id', null);
                     }),
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(function (Forms\Get $get) {
-                        $schoolYear = static::generateCurrentSchoolYear();
+                        $schoolYear = static::getCurrentSchoolYear();
                         return Section::where('department_id', $get('department_id'))
                             ->where('year_level', $get('year_level'))
                             ->where('school_year', $schoolYear)
@@ -336,7 +342,7 @@ class EnrollmentResource extends Resource
             ]),
         Forms\Components\TextInput::make('school_year')
             ->label('School Year')
-            ->default(static::generateCurrentSchoolYear())
+            ->default(static::getCurrentSchoolYear())
             ->readOnly()
             ->dehydrated(false)
             ->required(),
@@ -490,7 +496,7 @@ class EnrollmentResource extends Resource
     }
 
     // This retuns a new section ID
-    public static function getNewSection($sectionId, $schoolYear) : int {
+    public static function getNewSection($sectionId, $lastSemester) : int {
         $yearLevelPipeline = [
             "1st Year" => "2nd Year",
             "2nd Year" => "3rd Year",
@@ -502,15 +508,21 @@ class EnrollmentResource extends Resource
         $departmentId = $section->department->id;
         $yearLevel = $section->year_level;
 
+        if ($lastSemester == "2nd Semester") {
+            // Increment Year level by 1 if the previous semester is 2nd semester
+            $yearLevel = $yearLevelPipeline[$yearLevel];
+        }
+
         $newSection =
             Section::where('department_id', $departmentId)
                 ->where('year_level', $yearLevel)
                 ->where('class_number', $classNumber)
-                ->where('school_year', $schoolYear);
+                ->where('school_year', static::getCurrentSchoolYear())
+                ->first();
         return $newSection->id;
     }
 
-    public static function generateCurrentSchoolYear() : string {
+    public static function getCurrentSchoolYear() : string {
         // Current Date
         $date = Carbon::now();
         // Current Year $ Month
