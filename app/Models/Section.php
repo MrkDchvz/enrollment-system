@@ -31,7 +31,11 @@ class Section extends Model
     {
         return Attribute::make(
             get: fn ($value, $attributes) => trim(
-                "{$this->department->department_code} {$attributes['year_level']}-{$attributes['class_number']}"
+                sprintf("%s %d-%d",
+                        $this->department->department_code,
+                        preg_replace('/\D/', '', $attributes['year_level']),
+                        $attributes['class_number']
+                )
             )
         );
     }
@@ -39,8 +43,25 @@ class Section extends Model
     protected function fullSectionName() : Attribute {
         return Attribute::make(
             get: fn ($value, $attributes) => trim(
-                "{$this->department->department_code} {$attributes['year_level']}-{$attributes['class_number']} {$attributes['school_year']}"
+                sprintf("%s %d-%d %s",
+                    $this->department->department_code,
+                    preg_replace('/\D/', '', $attributes['year_level']),
+                    $attributes['class_number'],
+                    $attributes['school_year']
+                )
             )
         );
+    }
+
+    protected function yearLevelWithSuffix() : Attribute {
+        return Attribute::make(
+            get: fn ($value, $attributes) => match ($attributes['year_level']) {
+                '1' => "1st Year",
+                '2' => "2nd Year",
+                '3' => "3rd Year",
+                '4' => "4th Year",
+                    default => "Unknown Year",
+                }
+            );
     }
 }

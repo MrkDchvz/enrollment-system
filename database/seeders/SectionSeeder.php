@@ -25,19 +25,40 @@ class SectionSeeder extends Seeder
         $CS_Department = Department::where('department_code', 'BSCS')->first();
         $IT_Department = Department::where('department_code', 'BSIT')->first();
         for ($i = 1; $i <= $totalYearLevel; $i++) {
+            $yearLevel = match ($i) {
+                1 => "1st Year",
+                2 => "2nd Year",
+                3 => "3rd Year",
+                4 => "4th Year",
+                default => "Unknown Year",
+            };
             for ($j = 1; $j <= $totalClassNumbers; $j++) {
                 DB::table('sections')->insert([
                     'department_id' => $CS_Department->id,
                     'school_year' => $schoolYear,
                     'class_number' => $j,
-                    'year_level' => $i,
+                    'year_level' => $yearLevel,
                     ]);
 
                 DB::table('sections')->insert([
                     'department_id' => $IT_Department->id,
                     'school_year' => $schoolYear,
                     'class_number' => $j,
-                    'year_level' => $i,
+                    'year_level' => $yearLevel,
+                ]);
+
+                DB::table('sections')->insert([
+                    'department_id' => $CS_Department->id,
+                    'school_year' =>  "{$currentYear}-{$nextYear}",
+                    'class_number' => $j,
+                    'year_level' => $yearLevel,
+                ]);
+
+                DB::table('sections')->insert([
+                    'department_id' => $IT_Department->id,
+                    'school_year' => "{$currentYear}-{$nextYear}",
+                    'class_number' => $j,
+                    'year_level' => $yearLevel,
                 ]);
             }
         }

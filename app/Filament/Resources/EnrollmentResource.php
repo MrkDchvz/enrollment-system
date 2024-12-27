@@ -82,8 +82,8 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('enrollment_date')
                     ->label('Enrollment Date')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('year_level')
-                ->label('Year Level')
+                Tables\Columns\TextColumn::make('section.year_level')
+                    ->label('Year Level')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('semester')
                     ->toggleable(),
@@ -191,7 +191,7 @@ class EnrollmentResource extends Resource
                             if ($lastEnrollment) {
                                 // This is used to calculate the newyearlevel ONLY
                                 $lastSemester = $lastEnrollment->semester;
-                                $lastYearLevel = $lastEnrollment->year_level;
+                                $lastYearLevel = $lastEnrollment->yearLevel;
                                 $lastDepartment = $lastEnrollment->department_id;
                                 $lastRegistrationStatus = $lastEnrollment->registration_status;
 
@@ -266,6 +266,7 @@ class EnrollmentResource extends Resource
                             $get('year_level')
                         ));
                         $set('enrollmentFees', static::populateFees($state));
+                        $set('section_id', null);
 
                     }),
 
@@ -307,17 +308,19 @@ class EnrollmentResource extends Resource
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(function (Forms\Get $get) {
-                        $schoolyear = static::generateCurrentSchoolYear();
+                        $schoolYear = static::generateCurrentSchoolYear();
                         return Section::where('department_id', $get('department_id'))
+                            ->where('year_level', $get('year_level'))
+                            ->where('school_year', $schoolYear)
                             ->get()
                             ->mapWithKeys(function ($section) {
                                 return [
-                                    $section->id => $section->sectionName
+                                    $section->id => $section->fullSectionName
                                 ];
                             });
                     })
                     ->searchable()
-                    ->disabled(fn (Forms\get $get) => !$get('department_id'))
+                    ->disabled(fn (Forms\get $get) => (!$get('department_id') && !$get('year_level')))
                     ->required(),
 
                 Forms\Components\Select::make('old_new_student')
@@ -467,7 +470,9 @@ class EnrollmentResource extends Resource
     public static function generateCurrentSchoolYear() : string {
         $currentYear = Carbon::now()->year;
         $nextYear = Carbon::now()->addYear()->year;
-        return "{$currentYear} - {$nextYear}";
+        return trim(
+            sprintf('%s-%s', $currentYear, $nextYear)
+        );
     }
 
     public static function incrementYearLevel($yearLevel, $semester) : string {

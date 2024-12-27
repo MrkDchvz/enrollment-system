@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Dom\Attr;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +29,18 @@ class Enrollment extends Model
         'enrollment_date',
         'scholarship'
     ];
+
+    protected function schoolYear(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->section->school_year
+        );
+    }
+
+    protected function yearLevel(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->section->year_level
+        );
+    }
 
     public function student(): BelongsTo {
         return $this->belongsTo(Student::class)->withTrashed();

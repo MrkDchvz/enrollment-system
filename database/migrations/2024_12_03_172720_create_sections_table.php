@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('department_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->enum('year_level', [1,2,3,4]);
+            $table->enum('year_level', ["1st Year","2nd Year","3rd Year","4th Year"]);
             $table->integer('class_number');
             $table->string('school_year');
             $table->timestamps();
