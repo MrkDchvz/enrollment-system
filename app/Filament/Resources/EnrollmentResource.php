@@ -75,7 +75,7 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('enrollment_date')
                     ->label('Enrollment Date')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('departmentCode')
+                Tables\Columns\TextColumn::make('department.department_code')
                     ->label('Department')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -83,7 +83,7 @@ class EnrollmentResource extends Resource
                         'BSCS' => 'danger',
                     })
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('section.year_level')
+                Tables\Columns\TextColumn::make('year_level')
                     ->label('Year Level')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('semester')
@@ -91,7 +91,7 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('section.sectionName')
                     ->label('Section')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('section.school_year')
+                Tables\Columns\TextColumn::make('school_year')
                     ->label('School Year')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('old_new_student')
@@ -109,6 +109,26 @@ class EnrollmentResource extends Resource
                         '1st Semester' => '1st Semester',
                         '2nd Semester' => '2nd Semester',
                     ]),
+                SelectFilter::make('school_year')
+                    ->label('School Year')
+                    ->options(function () {
+                        return Enrollment::distinct()
+                            ->pluck('school_year', 'school_year')
+                            ->toArray();
+                }),
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->options(function () {
+                        return Department::all()
+                            ->pluck('department_code', 'id')
+                            ->toArray();
+                }),
+                SelectFilter::make('registration_status')
+                ->label('Registration Status')
+                ->options([
+                    'IRREGULAR' => 'IRREGULAR',
+                    'REGULAR' => 'REGULAR',
+                ])
             ])
             ->actions([
                 Tables\Actions\ForceDeleteAction::make(),
