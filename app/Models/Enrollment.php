@@ -48,13 +48,16 @@ class Enrollment extends Model
         );
     }
 
+    protected function department(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->section->department_id
+        );
+    }
+
     public function student(): BelongsTo {
         return $this->belongsTo(Student::class)->withTrashed();
     }
-
-    public function department() : BelongsTo {
-        return $this->belongsTo(Department::class);
-    }
+    
 
     public function user() : BelongsTo {
         return $this->belongsTo(User::class);

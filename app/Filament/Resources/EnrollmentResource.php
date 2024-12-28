@@ -200,14 +200,14 @@ class EnrollmentResource extends Resource
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
                                 $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
                                 // Get new section
-                                $newSection = Section::find(self::getNewSection($lastSectionId, $lastSemester));
+                                $newSectionId = self::getNewSection($lastSectionId, $lastSemester);
                                 // Assign default year level based on latest enrollment data of student
                                 // Retains the year level if the last record is on 1st semester
                                 $set('year_level', $newYearLevel);
                                 $set('registration_status', $lastRegistrationStatus);
                                 $set('old_new_student', 'Old Student');
                                 $set('department_id', $lastDepartment);
-                                $set('section_id', $newSection->fullSectionName);
+                                $set('section_id', $newSectionId);
                                 // Autofill courses base on Department, Year_level, and semester
                                 $set('courseEnrollments', static::populateCourse(
                                     $currentSemester,
@@ -316,18 +316,19 @@ class EnrollmentResource extends Resource
                     }),
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
-                    ->options(function (Forms\Get $get) {
-                        $schoolYear = static::getCurrentSchoolYear();
-                        return Section::where('department_id', $get('department_id'))
-                            ->where('year_level', $get('year_level'))
-                            ->where('school_year', $schoolYear)
-                            ->get()
-                            ->mapWithKeys(function ($section) {
-                                return [
-                                    $section->id => $section->fullSectionName
-                                ];
-                            });
-                    })
+                    ->options(Section::all()->pluck('fullSectionName', 'id'))
+//                        function (Forms\Get $get) {
+//                        $schoolYear = static::getCurrentSchoolYear();
+//                        return Section::where('department_id', $get('department_id'))
+//                            ->where('year_level', $get('year_level'))
+//                            ->where('school_year', $schoolYear)
+//                            ->get()
+//                            ->mapWithKeys(function ($section) {
+//                                return [
+//                                    $section->id => $section->fullSectionName
+//                                ];
+//                            });
+//                    })
                     ->searchable()
                     ->disabled(fn (Forms\get $get) => (!$get('department_id') && !$get('year_level')))
                     ->required(),
@@ -348,7 +349,6 @@ class EnrollmentResource extends Resource
             ->required(),
         ];
     }
-
     public static function getCourseRepeater(): TableRepeater {
         return TableRepeater::make('courseEnrollments')
             ->headers([

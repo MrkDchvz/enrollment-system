@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('department_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('section_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('registration_status', ['REGULAR', 'IRREGULAR']);

@@ -10,10 +10,6 @@ class Department extends Model
     //
     protected $fillable = ['department_code', 'department_name'];
 
-    public function enrollments(): HasMany {
-        return $this->hasMany(Enrollment::class);
-    }
-
     public function instructors (): HasMany {
         return $this->hasMany(Instructor::Class);
     }
