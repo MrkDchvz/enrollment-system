@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Dom\Attr;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +18,6 @@ class Enrollment extends Model
 
     protected $fillable = [
         'user_id',
-        'department_id',
         'student_id',
         'section_id',
         'registration_status',
@@ -48,16 +46,16 @@ class Enrollment extends Model
         );
     }
 
-    protected function department(): Attribute {
+    protected function departmentCode(): Attribute {
         return Attribute::make(
-            get: fn() => $this->section->department_id
+            get: fn() => $this->section?->department?->department_code
         );
     }
 
     public function student(): BelongsTo {
         return $this->belongsTo(Student::class)->withTrashed();
     }
-    
+
 
     public function user() : BelongsTo {
         return $this->belongsTo(User::class);

@@ -19,6 +19,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,15 +60,6 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('student.full_name')
                     ->label('Full Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('department.department_code')
-                    ->label('Department')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'BSCS' => 'danger',
-                        'BSIT' => 'success',
-
-                    })
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('registration_status')
                     ->label('Registration Status')
                     ->badge()
@@ -82,6 +74,14 @@ class EnrollmentResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('enrollment_date')
                     ->label('Enrollment Date')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('departmentCode')
+                    ->label('Department')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'BSIT' => 'success',
+                        'BSCS' => 'danger',
+                    })
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('section.year_level')
                     ->label('Year Level')
@@ -109,23 +109,31 @@ class EnrollmentResource extends Resource
                         '1st Semester' => '1st Semester',
                         '2nd Semester' => '2nd Semester',
                     ]),
+                Filter::make('schoolYear')
+                    ->form([
+                        Forms\Components\Select::make('filterSchoolYear')
+                            ->label('School Year')
+                            ->options(function() {
+                                return collect(['All' => 'All'])
+                                    ->merge(
+                                        Section::distinct()
+                                            ->pluck('school_year', 'school_year')
+                                    )
+                                    ->toArray();
+                            })
+                    ->default('All')
+                    ->selectablePlaceholder(false)
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!isset($data['filterSchoolYear']) || $data['filterSchoolYear'] === 'All') {
+                            return $query;
+                        }
 
-                SelectFilter::make('department_id')
-                    ->label('Department')
-                    ->relationship('department', 'department_code')
-                    ->preload(),
-                SelectFilter::make('school_year')
-                    ->label('School Year')
-                    ->options(function () {
-                        return Section::select('school_year')
-                                ->distinct()
-                                ->pluck('school_year', 'school_year');
-                    })
-                    ->searchable(),
-                SelectFilter::make('old_new_student')
-                    ->label('Old /New Student')
-
-
+                        return $query->whereHas('section', function ($query) use ($data) {
+                            $query
+                                ->where('school_year', $data['filterSchoolYear']);
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\ForceDeleteAction::make(),
@@ -148,8 +156,6 @@ class EnrollmentResource extends Resource
         }
 
     }
-
-
     public static function getRelations(): array
     {
         return [
@@ -193,7 +199,7 @@ class EnrollmentResource extends Resource
                                 // This is used to calculate the newyearlevel ONLY
                                 $lastSemester = $lastEnrollment->semester;
                                 $lastYearLevel = $lastEnrollment->yearLevel;
-                                $lastDepartment = $lastEnrollment->department_id;
+                                $lastDepartment = $lastEnrollment->section->department_id;
                                 $lastRegistrationStatus = $lastEnrollment->registration_status;
                                 $lastSectionId = $lastEnrollment->section_id;
 

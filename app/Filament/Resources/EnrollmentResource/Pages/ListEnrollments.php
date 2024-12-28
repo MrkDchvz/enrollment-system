@@ -26,17 +26,19 @@ class ListEnrollments extends ListRecords
             $tabs['all'] = Tab::make('All Enrollments')
                 ->badge(Enrollment::count());
             $tabs['1st Year'] = Tab::make('1st Year')
-                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', 1))->count())
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', 1)));
+                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', '1st Year'))->count())
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', '1st Year')));
             $tabs['2nd Year'] = Tab::make('2nd Year')
-                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', 2))->count())
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', 2)));
+                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', '2nd Year'))->count())
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', '2nd Year')));
             $tabs['3rd Year'] = Tab::make('3rd Year')
-                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', 3))->count())
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', 3)));
+                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', '3rd Year'))->count())
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', '3rd Year')));
             $tabs['4th Year'] = Tab::make('4th Year')
-                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', 4))->count())
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', 4)));
+                ->badge(Enrollment::whereHas('section', fn($query) => $query->where('year_level', '4th Year'))->count())
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('section', fn($query) => $query->where('year_level', '4th Year')));
+        }
+        if (auth()->user()->hasRole(['Admin'])) {
             $tabs['trashed'] = Tab::make('Trashed')
                 ->badge(Enrollment::onlyTrashed()->count())
                 ->modifyQueryUsing(fn ($query) => $query->onlyTrashed());

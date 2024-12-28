@@ -21,15 +21,6 @@ class EnrollmentFactory extends Factory
      */
     public function definition(): array
     {
-        $department = Department::inRandomOrder()->firstOrFail();
-        // in_array ensures that the value will be either BSCS or BSIT
-        if (in_array($department->department_code, ['BSCS', 'BSIT'])) {
-            $section = DB::table('sections')
-                ->where('department_code', $department->department_code)
-                ->inRandomOrder()
-                ->first();
-        }
-
         $section = DB::table('sections')->inRandomOrder()->first();
         $user = User::role('Officer')->inRandomOrder()->first();
 //        Carbon is a dateTime Library built in laravel
@@ -42,7 +33,6 @@ class EnrollmentFactory extends Factory
             'student_id' => function () {
                 return Student::factory()->create()->id;
             },
-            'department_id' => $department->id,
 //            NOTE: CHANGE THIS TO REGISTRAR'S ID.
             'user_id' =>  $user->id,
             'section_id' => $section->id,
