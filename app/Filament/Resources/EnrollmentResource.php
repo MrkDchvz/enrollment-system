@@ -109,31 +109,6 @@ class EnrollmentResource extends Resource
                         '1st Semester' => '1st Semester',
                         '2nd Semester' => '2nd Semester',
                     ]),
-                Filter::make('schoolYear')
-                    ->form([
-                        Forms\Components\Select::make('filterSchoolYear')
-                            ->label('School Year')
-                            ->options(function() {
-                                return collect(['All' => 'All'])
-                                    ->merge(
-                                        Section::distinct()
-                                            ->pluck('school_year', 'school_year')
-                                    )
-                                    ->toArray();
-                            })
-                    ->default('All')
-                    ->selectablePlaceholder(false)
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (!isset($data['filterSchoolYear']) || $data['filterSchoolYear'] === 'All') {
-                            return $query;
-                        }
-
-                        return $query->whereHas('section', function ($query) use ($data) {
-                            $query
-                                ->where('school_year', $data['filterSchoolYear']);
-                        });
-                    }),
             ])
             ->actions([
                 Tables\Actions\ForceDeleteAction::make(),
@@ -146,6 +121,7 @@ class EnrollmentResource extends Resource
                 ]),
             ]);
     }
+
     public static function getEloquentQuery(): Builder
     {
         if (auth()->user()->hasRole('Student')) {

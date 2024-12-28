@@ -18,8 +18,10 @@ class Enrollment extends Model
 
     protected $fillable = [
         'user_id',
+        'department_id',
         'student_id',
         'section_id',
+        'school_year',
         'registration_status',
         'old_new_student',
         'year_level',
@@ -28,27 +30,9 @@ class Enrollment extends Model
         'scholarship'
     ];
 
-    protected function schoolYear(): Attribute {
-        return Attribute::make(
-            get: fn() => $this->section->school_year
-        );
-    }
-
-    protected function yearLevel(): Attribute {
-        return Attribute::make(
-            get: fn() => $this->section->year_level
-        );
-    }
-
     protected function classNumber(): Attribute {
         return Attribute::make(
             get: fn() => $this->section->class_number
-        );
-    }
-
-    protected function departmentCode(): Attribute {
-        return Attribute::make(
-            get: fn() => $this->section?->department?->department_code
         );
     }
 
@@ -56,6 +40,9 @@ class Enrollment extends Model
         return $this->belongsTo(Student::class)->withTrashed();
     }
 
+    public function department() : BelongsTo {
+        return $this->belongsTo(Department::class);
+    }
 
     public function user() : BelongsTo {
         return $this->belongsTo(User::class);

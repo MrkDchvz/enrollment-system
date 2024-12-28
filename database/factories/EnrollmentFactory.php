@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Department;
+use App\Models\Section;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
@@ -21,7 +22,13 @@ class EnrollmentFactory extends Factory
      */
     public function definition(): array
     {
-        $section = DB::table('sections')->inRandomOrder()->first();
+
+
+        $section = Section::inRandomOrder()->first();
+        // This ensures that the department, yearlevel, schoolYear is the same with the section
+        $department = $section->department;
+        $yearLevel = $section->year_level;
+        $schoolYear = $section->school_year;
         $user = User::role('Officer')->inRandomOrder()->first();
 //        Carbon is a dateTime Library built in laravel
 //        now() = gets the current date, ->year =  gets the year from a date
@@ -33,11 +40,14 @@ class EnrollmentFactory extends Factory
             'student_id' => function () {
                 return Student::factory()->create()->id;
             },
+            'department_id' => $department->id,
 //            NOTE: CHANGE THIS TO REGISTRAR'S ID.
             'user_id' =>  $user->id,
             'section_id' => $section->id,
             'scholarship' => $scholarship,
             'registration_status' => $this->faker->randomElement(['REGULAR', 'IRREGULAR']),
+            'school_year' => $schoolYear,
+            'year_level' => $yearLevel,
             'semester' => $this->faker->randomElement(['1st Semester', '2nd Semester']),
             'old_new_student' => $this->faker->randomElement(['Old Student', 'New Student']),
             'enrollment_date' => Carbon::now()->format('Y-m-d'),
