@@ -49,14 +49,14 @@ class SectionSeeder extends Seeder
 
                 DB::table('sections')->insert([
                     'department_id' => $CS_Department->id,
-                    'school_year' =>  "{$currentYear}-{$nextYear}",
+                    'school_year' =>  "2023-2024",
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                 ]);
 
                 DB::table('sections')->insert([
                     'department_id' => $IT_Department->id,
-                    'school_year' => "{$currentYear}-{$nextYear}",
+                    'school_year' => "2023-2024",
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                 ]);
