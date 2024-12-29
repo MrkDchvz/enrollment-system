@@ -16,9 +16,10 @@ return new class extends Migration
                 $table->string('course_code')->unique();
                 $table->string('course_name');
                 $table->integer('lecture_units');
-                $table->integer('lab_units')->nullable();
+                $table->integer('lab_units');
                 $table->integer('lecture_hours');
-                $table->integer('lab_hours')->nullable();
+                $table->integer('lab_hours');
+                $table->timestamps();
             });
     }
 

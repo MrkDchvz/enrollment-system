@@ -31,4 +31,10 @@ class Course extends Model
     public function populators() : HasMany {
         return $this->hasMany(Populator::class);
     }
+
+    public function courseEnrollments(): HasMany {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+
 }

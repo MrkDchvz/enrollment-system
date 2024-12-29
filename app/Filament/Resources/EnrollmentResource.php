@@ -277,7 +277,7 @@ class EnrollmentResource extends Resource
                         }
                     }),
             ]),
-            Forms\Components\Grid::make(2)->schema([
+            Forms\Components\Grid::make(3)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(Section::all()->pluck('fullSectionName', 'id'))
@@ -307,7 +307,12 @@ class EnrollmentResource extends Resource
                         'New Student' => 'New Student',
                     ])
                     ->required(),
+                Forms\Components\TextInput::make('school_year')
+                    ->label('School Year')
+                    ->disabled()
+                    ->default(static::getCurrentSchoolYear()),
             ]),
+
         ];
     }
     public static function getCourseRepeater(): TableRepeater {
@@ -358,36 +363,36 @@ class EnrollmentResource extends Resource
                     ]),
                 Forms\Components\TextInput::make('course_name')
                     ->label('Course Description')
-                    ->disabled()
-                    ->dehydrated()
+                    ->readOnly()
+                    ->required()
                     ->columnSpan([
                         'md' => 4
                     ]),
                 Forms\Components\TextInput::make('lecture_units')
                     ->label('Lec')
-                    ->disabled()
-                    ->dehydrated()
+                    ->readOnly()
+                    ->required()
                     ->columnSpan([
                         'md' => 1
                     ]),
                 Forms\Components\TextInput::make('lab_units')
                     ->label('Lab')
-                    ->disabled()
-                    ->dehydrated()
+                    ->readOnly()
+                    ->required()
                     ->columnSpan([
                         'md' => 1
                     ]),
                 Forms\Components\TextInput::make('lecture_hours')
                     ->label('Lec')
-                    ->disabled()
-                    ->dehydrated()
+                    ->readOnly()
+                    ->required()
                     ->columnSpan([
                         'md' => 1
                     ]),
                 Forms\Components\TextInput::make('lab_hours')
                     ->label('Lec')
-                    ->disabled()
-                    ->dehydrated()
+                    ->readOnly()
+                    ->required()
                     ->columnSpan([
                         'md' => 1
                     ]),
@@ -415,6 +420,7 @@ class EnrollmentResource extends Resource
                     ->preload()
                     ->placeholder('Select Fee')
                     ->required()
+                    ->required()
                     ->reactive()
                     ->distinct()
                     ->afterStateUpdated(function ($state, Forms\set $set) {
@@ -435,8 +441,6 @@ class EnrollmentResource extends Resource
             ->hiddenLabel()
             ->defaultItems(0);
     }
-
-
 
 
     public static function incrementYearLevel($yearLevel, $semester) : string {
