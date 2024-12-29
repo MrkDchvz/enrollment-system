@@ -31,6 +31,12 @@ class CreateEnrollment extends CreateRecord
         $data['year_level'] = $year_level;
         $data['department_id'] = $departmentId;
 
+
         return $data;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

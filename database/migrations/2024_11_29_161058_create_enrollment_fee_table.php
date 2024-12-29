@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('enrollment_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('fee_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->float('amount');
             $table->timestamps();
         });
     }
