@@ -277,7 +277,7 @@ class EnrollmentResource extends Resource
                         }
                     }),
             ]),
-            Forms\Components\Grid::make(2)->schema([
+            Forms\Components\Grid::make(3)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(Section::all()->pluck('fullSectionName', 'id'))
@@ -307,7 +307,12 @@ class EnrollmentResource extends Resource
                         'New Student' => 'New Student',
                     ])
                     ->required(),
+                Forms\Components\TextInput::make('school_year')
+                    ->label('School Year')
+                    ->disabled()
+                    ->default(static::getCurrentSchoolYear()),
             ]),
+
         ];
     }
     public static function getCourseRepeater(): TableRepeater {

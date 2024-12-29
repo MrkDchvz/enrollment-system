@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('enrollment_fee', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('enrollment_id')->constrained();
-            $table->foreignId('fee_id')->constrained();
+            $table->foreignId('enrollment_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('fee_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
