@@ -40,6 +40,16 @@ class Section extends Model
         );
     }
 
+    protected function classNumberAndYearLevel() : Attribute {
+        return Attribute::make(
+            get: fn ($value, $attributes) => trim(
+                sprintf("%d-%d",
+                $attributes['year_level'],
+                $attributes['class_number'])
+            )
+        );
+    }
+
     protected function fullSectionName() : Attribute {
         return Attribute::make(
             get: fn ($value, $attributes) => trim(
