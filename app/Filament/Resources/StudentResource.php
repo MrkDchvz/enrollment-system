@@ -122,6 +122,8 @@ class StudentResource extends Resource
 //                    return $query->where('user_id', auth()->id());
 //                }}
 //            )
+            ->defaultSort('created_at', 'desc')
+            ->searchable(false)
             ->columns([
                 TextColumn::make('student_number')
 
@@ -144,7 +146,7 @@ class StudentResource extends Resource
                 TextColumn::make('user.email')
                     ->label('email')
                     ->toggleable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('gender')
                     ->toggleable(),
                 TextColumn::make('date_of_birth')
@@ -153,10 +155,10 @@ class StudentResource extends Resource
                     ->date('F j, Y'),
                 TextColumn::make('address')
                     ->toggleable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('contact_number')
                     ->toggleable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('deleted_at')
                     ->toggleable()
                     ->visible(fn($record) => $record && $record->trashed()),
@@ -183,8 +185,6 @@ class StudentResource extends Resource
         }
 
     }
-
-
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -333,7 +333,6 @@ class StudentResource extends Resource
                     ->markAsRequired(),
             ])
             ->streamlined()
-//            Auto detect relationships of the CourseStudent model I guess?
             ->relationship()
             ->schema([
                 Forms\Components\Select::make('course_id')

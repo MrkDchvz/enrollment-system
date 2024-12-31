@@ -37,7 +37,7 @@ class EnrollmentPolicy
      */
     public function update(User $user, Enrollment $enrollment): bool
     {
-        return $user->hasRole(['Admin', 'Registrar']);
+        return $user->hasRole(['Admin']);
     }
 
     /**

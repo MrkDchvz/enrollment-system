@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Enums\RegistrationStatus;
 use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
+use App\Livewire\ListEnrollmentCourses;
+use App\Livewire\ListEnrollmentFees;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\Department;
@@ -17,8 +19,13 @@ use Awcodes\TableRepeater\Header;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Fieldset;
+use Filament\Infolists\Components\Livewire;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -53,13 +60,16 @@ class EnrollmentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordAction(null)
+            ->searchable(false)
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('student.student_number')
                     ->label('Student Number')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('student.full_name')
+                    ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('student.fullName')
                     ->label('Full Name')
-                    ->searchable(),
+                    ->searchable(['first_name', 'middle_name', 'last_name'], isIndividual: true),
                 Tables\Columns\TextColumn::make('registration_status')
                     ->label('Registration Status')
                     ->badge()
@@ -99,7 +109,7 @@ class EnrollmentResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Encoder')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->toggleable(),
             ])
             ->filters([
@@ -131,15 +141,12 @@ class EnrollmentResource extends Resource
                 ])
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn($record) => $record->trashed()),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ], position: ActionsPosition::BeforeColumns);
     }
 
     public static function getEloquentQuery(): Builder
@@ -152,6 +159,62 @@ class EnrollmentResource extends Resource
         }
 
     }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        $enrollmentId = $infolist->record->id;
+        return $infolist
+            ->schema([
+                Fieldset::make('Student Information')->schema([
+                    TextEntry::make('student.student_number')
+                        ->label('Student Number'),
+                    TextEntry::make('student.full_name')
+                        ->label('Full Name'),
+                    TextEntry::make('student.gender')
+                        ->label('Gender'),
+                ])->columns(3),
+                Fieldset::make('Enrollment Information')->schema([
+                    TextEntry::make('department.department_code')
+                        ->label('Department')
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'BSCS' => 'danger',
+                            'BSIT' => 'success',
+                        }),
+                    TextEntry::make('year_level')
+                        ->label('Year Level'),
+                    TextEntry::make('semester')
+                        ->label('Semester'),
+                    TextEntry::make('section.classNumberAndYearLevel')
+                        ->label('Section'),
+                    TextEntry::make('registration_status')
+                        ->label('Registration Status')
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'IRREGULAR' => 'info',
+                            'REGULAR' => 'success',
+                        }),
+                    TextEntry::make('old_new_student')
+                        ->label('Old/New Student'),
+                    TextEntry::make('enrollment_date')
+                        ->label('Enrollment Date')
+                        ->formatStateUsing(fn ($state) => Carbon::parse($state)->format('F j, Y')),
+                    TextEntry::make('school_year')
+                        ->label('School Year'),
+                    TextEntry::make('user.name')
+                        ->label('Encoder'),
+                ])->columns(3),
+                Fieldset::make('Courses')->schema([
+                    Livewire::make(ListEnrollmentCourses::class, ['enrollmentId' => $enrollmentId])
+                        ->columnSpanFull(),
+                ]),
+                Fieldset::make('Fees')->schema([
+                    Livewire::make(ListEnrollmentFees::class, ['enrollmentId' => $enrollmentId])
+                        ->columnSpanFull(),
+                ])
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -165,6 +228,7 @@ class EnrollmentResource extends Resource
             'index' => Pages\ListEnrollments::route('/'),
             'create' => Pages\CreateEnrollment::route('/create'),
             'edit' => Pages\EditEnrollment::route('/{record}/edit'),
+            'view' => Pages\ViewEnrollment::route('/{record}'),
         ];
     }
 
