@@ -23,10 +23,11 @@ class AppPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->profile()
             ->default()
             ->id('app')
             ->path('/')
-            ->login()
+            ->login(\Filament\Pages\Auth\Login::class)
             ->colors([
                 'primary' => Color::Teal,
                 'gray' => Color::Slate,
