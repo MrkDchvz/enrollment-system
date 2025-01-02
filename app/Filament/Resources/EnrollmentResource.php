@@ -146,6 +146,13 @@ class EnrollmentResource extends Resource
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn($record) => $record->trashed()),
+                Tables\Actions\Action::make('pdf')
+                    ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
+                    ->label('Download PDF')
+                    ->color('danger')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->url(fn (Enrollment $record) => route('pdf', $record))
+                    ->openUrlInNewTab(),
             ], position: ActionsPosition::BeforeColumns);
     }
 
@@ -473,7 +480,7 @@ class EnrollmentResource extends Resource
             ->headers([
                 Header::make('Name')
                     ->markAsRequired(),
-                Header::make('Amount (in Pesos)'),
+                Header::make('Amount'),
             ])
             ->streamlined()
             ->relationship()
@@ -499,7 +506,11 @@ class EnrollmentResource extends Resource
                     ->options(Fee::all()->pluck('name', 'id')),
 
                 Forms\Components\TextInput::make('amount')
-                    ->readOnly(),
+                    ->numeric()
+                    ->inputMode('decimal')
+                    ->minValue(1)
+                    ->required()
+                    ->prefix("₱")
             ])
             ->addActionLabel('Add Fee')
             ->hiddenLabel()
@@ -546,6 +557,7 @@ class EnrollmentResource extends Resource
             Section::where('department_id', $departmentId)
                 ->where('year_level', $yearLevel)
                 ->where('class_number', $classNumber)
+                // Get the section of the current school Year
                 ->where('school_year', static::getCurrentSchoolYear())
                 ->first();
         return $newSection->id;
@@ -620,6 +632,7 @@ class EnrollmentResource extends Resource
             case '2nd Year':
                 $fees  = Fee::selectRaw('id as fee_id, amount')
                     ->whereNot('name', 'NSTP')
+                    ->whereNot('name', 'Late Reg.')
                     ->get()
                     ->toArray();
                 break;

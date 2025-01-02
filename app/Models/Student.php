@@ -84,6 +84,17 @@ class Student extends Model
     );
     }
 
+    protected function fullNameCOR() : Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => trim(
+                "{$attributes['last_name']} " .
+                "{$attributes['first_name']} " .
+                ($attributes['middle_name'] ? "{$attributes['middle_name']} " : "")
+            ),
+        );
+    }
+
     public function email() : attribute {
         return Attribute::make(
             get: fn () => $this->user->email,
