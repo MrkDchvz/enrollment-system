@@ -84,6 +84,10 @@
             font-weight: 700;
         }
 
+        .italic  {
+            font-style: italic;
+        }
+
     </style>
 </head>
 <body>
@@ -707,7 +711,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Old/New Student:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Old/New Student:</td>
                             <td style="text-align: left; width: 50%;">{{$record->old_new_student}}</td>
                         </tr>
                     </table>
@@ -718,7 +722,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Registration Status:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Registration Status:</td>
                             <td style="text-align: left; width: 50%;">{{$record->registration_status}}</td>
                         </tr>
                     </table>
@@ -729,7 +733,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Date of Birth:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Date of Birth:</td>
                             <td style="text-align: left; width: 50%;">{{Carbon::parse($record->student->date_of_birth)->format('F j, Y')}}</td>
                         </tr>
                     </table>
@@ -740,7 +744,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Gender:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Gender:</td>
                             <td style="text-align: left; width: 50%;">{{$record->student->gender}}</td>
                         </tr>
                     </table>
@@ -751,7 +755,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Contact Number:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Contact Number:</td>
                             <td style="text-align: left; width: 50%;">0{{$record->student->contact_number}}</td>
                         </tr>
                     </table>
@@ -762,7 +766,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">E-mail Address:</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">E-mail Address:</td>
                             <td style="text-align: left; width: 50%;">{{$record->student->email}}</td>
                         </tr>
                     </table>
@@ -777,7 +781,7 @@
                 <td>
                     <table class="table-border-hidden">
                         <tr>
-                            <td class="font-bold" style="text-align: left; width: 20%;">Student's signature</td>
+                            <td class="font-bold italic" style="text-align: left; width: 20%;">Student's signature</td>
                             <td style="text-align: left; width: 50%;">_________________________</td>
                         </tr>
                     </table>
