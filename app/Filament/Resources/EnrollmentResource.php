@@ -480,7 +480,7 @@ class EnrollmentResource extends Resource
             ->headers([
                 Header::make('Name')
                     ->markAsRequired(),
-                Header::make('Amount (in Pesos)'),
+                Header::make('Amount'),
             ])
             ->streamlined()
             ->relationship()
@@ -506,7 +506,11 @@ class EnrollmentResource extends Resource
                     ->options(Fee::all()->pluck('name', 'id')),
 
                 Forms\Components\TextInput::make('amount')
-                    ->readOnly(),
+                    ->numeric()
+                    ->inputMode('decimal')
+                    ->minValue(1)
+                    ->required()
+                    ->prefix("₱")
             ])
             ->addActionLabel('Add Fee')
             ->hiddenLabel()
