@@ -543,7 +543,7 @@ class EnrollmentResource extends Resource
         $classNumber = $section->class_number;
         $departmentId = $section->department->id;
         $yearLevel = $section->year_level;
-
+        
         if ($lastSemester == "2nd Semester" && $yearLevel !== "4th Year") {
             // Increment Year level by 1 if the previous semester is 2nd semester
             $yearLevel = $yearLevelPipeline[$yearLevel];

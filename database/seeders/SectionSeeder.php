@@ -18,9 +18,8 @@ class SectionSeeder extends Seeder
         $totalYearLevel = 4;
         $totalClassNumbers = 7;
 
-        $currentYear = Carbon::now()->year;
-        $nextYear = $currentYear + 1;
-        $schoolYear =  "{$currentYear}-{$nextYear}";
+        $schoolYear = static::getCurrentSchoolYear();
+
 
         $CS_Department = Department::where('department_code', 'BSCS')->first();
         $IT_Department = Department::where('department_code', 'BSIT')->first();
@@ -64,5 +63,30 @@ class SectionSeeder extends Seeder
         }
 
 
+    }
+
+    public static function getCurrentSchoolYear() : string {
+        // Current Date
+        $date = Carbon::now();
+        // Current Year $ Month
+        $year = $date->year;
+        $month = $date->month;
+        // Set a new school year if the enrollment is in around august
+        // If the year is 2024 and the student enrolled around august 2024
+        // Then the school year will be 2024 - 2024
+        if ($month >= 8) {
+            $startYear = $date->year;
+            $endYear = $date->year + 1;
+        }
+        // Retain the current school year if the enrollment is around february
+        // If the year is 2024 and the student enrolled around february 2024
+        // Then the school year is 2023-2024
+        else {
+            $startYear = $date->year - 1;
+            $endYear = $date->year;
+        }
+        return trim(
+            sprintf('%s-%s', $startYear, $endYear)
+        );
     }
 }
