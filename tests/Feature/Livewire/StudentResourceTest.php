@@ -106,12 +106,12 @@ it('can create a record', function () {
             'gender' => $record->gender,
             'date_of_birth' => $record->date_of_birth,
             'contact_number' => $record->contact_number,
-            // Student factory creates a user when its called
+            // Student factory creates a user when called
             // The create form also creates a new user before the form was submitted (MutateBeforeCreate Hook)
             // if $record->email is entered on the 'email' of this form will result a duplication because
             // an email is created in the factory then is assigned to 'email' of this form which will be assigned
             // on the MutateBeforeCreate Hook that also creates a User base on the input email ($data['email'])
-            // for testing purposes a custom email is entered to avoid duplication
+            // for testing purposes a custom email entered to avoid duplication
             'email' => 'testing@email.com',
             'address' => $record->address,
             'password' => 'password',
