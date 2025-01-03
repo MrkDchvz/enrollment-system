@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Department;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -21,8 +22,25 @@ class SectionSeeder extends Seeder
         $schoolYear = static::getCurrentSchoolYear();
 
 
-        $CS_Department = Department::where('department_code', 'BSCS')->first();
-        $IT_Department = Department::where('department_code', 'BSIT')->first();
+        try {
+            $CS_Department = Department::where('department_code', 'BSCS')->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            $CS_Department = Department::create([
+                'department_code' => 'BSCS',
+                'department_name' => 'Department of Computer Studies'
+            ]);
+        }
+
+        try {
+            $IT_Department = Department::where('department_code', 'BSIT')->first();
+
+        } catch (ModelNotFoundException $e) {
+            $IT_Department = Department::create([
+                'department_code' => 'BSIT',
+                'department_name' => 'Department of Information Technology'
+            ]);
+        }
+
         for ($i = 1; $i <= $totalYearLevel; $i++) {
             $yearLevel = match ($i) {
                 1 => "1st Year",

@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,18 +24,40 @@ class EnrollmentFactory extends Factory
     public function definition(): array
     {
 
+        try {
+            // Attempt to fetch a random section
+            $section = Section::inRandomOrder()->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            // If no section exists, create a new one
+            $CS_Department = Department::create([
+                'department_code' => 'BSCS',
+                'department_name' => 'Department of Computer Studies'
+            ]);
+            $IT_Department = Department::create([
+                'department_code' => 'BSIT',
+                'department_name' => 'Department of Information Technology'
+            ]);
+            $randomDepartment = Department::inRandomOrder()->firstOrFail();
 
-        $section = Section::inRandomOrder()->first();
+            $section = Section::create([
+                'department_id' => $randomDepartment->id,
+                'year_level' => $this->faker->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
+                'class_number' => $this->faker->numberBetween(1, 10),
+                'school_year' => static::getCurrentSchoolYear(),
+            ]);
+        }
         // This ensures that the department, yearlevel, schoolYear is the same with the section
         $department = $section->department;
         $yearLevel = $section->year_level;
         $schoolYear = $section->school_year;
-        $user = User::role('Officer')->inRandomOrder()->first();
-//        Carbon is a dateTime Library built in laravel
-//        now() = gets the current date, ->year =  gets the year from a date
-//        addYear() = a method to add year to a date
-        $currentYear = Carbon::now()->year;
-        $nextYear = Carbon::now()->addYear()->year;
+
+        try {
+            $user = User::role('Admin')->inRandomOrder()->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            $user = User::factory()->create();
+            $user->assignRole('Admin');
+        }
+
         $scholarship = "CHED Free Tution and Misc. Fee";
         return [
             'student_id' => function () {
@@ -52,5 +75,29 @@ class EnrollmentFactory extends Factory
             'old_new_student' => $this->faker->randomElement(['Old Student', 'New Student']),
             'enrollment_date' => Carbon::now()->format('Y-m-d'),
         ];
+    }
+    public static function getCurrentSchoolYear() : string {
+        // Current Date
+        $date = Carbon::now();
+        // Current Year $ Month
+        $year = $date->year;
+        $month = $date->month;
+        // Set a new school year if the enrollment is in around august
+        // If the year is 2024 and the student enrolled around august 2024
+        // Then the school year will be 2024 - 2024
+        if ($month >= 8) {
+            $startYear = $date->year;
+            $endYear = $date->year + 1;
+        }
+        // Retain the current school year if the enrollment is around february
+        // If the year is 2024 and the student enrolled around february 2024
+        // Then the school year is 2023-2024
+        else {
+            $startYear = $date->year - 1;
+            $endYear = $date->year;
+        }
+        return trim(
+            sprintf('%s-%s', $startYear, $endYear)
+        );
     }
 }
