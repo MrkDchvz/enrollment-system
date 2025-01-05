@@ -59,6 +59,39 @@ class EnrollmentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $filters = [];
+
+        if (auth()->user()->hasRole(['Admin', 'Registrar'])) {
+           $filters = [
+                SelectFilter::make('semester')
+                    // Key (in the database) => Display in the forms
+                    ->options([
+                        '1st Semester' => '1st Semester',
+                        '2nd Semester' => '2nd Semester',
+                    ]),
+                SelectFilter::make('school_year')
+                    ->label('School Year')
+                    ->options(function () {
+                        return Enrollment::distinct()
+                            ->pluck('school_year', 'school_year')
+                            ->toArray();
+                    }),
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->options(function () {
+                        return Department::all()
+                            ->pluck('department_code', 'id')
+                            ->toArray();
+                    }),
+                SelectFilter::make('registration_status')
+                    ->label('Registration Status')
+                    ->options([
+                        'IRREGULAR' => 'IRREGULAR',
+                        'REGULAR' => 'REGULAR',
+                    ]),
+              ];
+        }
+
         return $table
             ->recordAction(null)
             ->searchable(false)
@@ -112,34 +145,7 @@ class EnrollmentResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable(),
             ])
-            ->filters([
-                SelectFilter::make('semester')
-                    // Key (in the database) => Display in the forms
-                    ->options([
-                        '1st Semester' => '1st Semester',
-                        '2nd Semester' => '2nd Semester',
-                    ]),
-                SelectFilter::make('school_year')
-                    ->label('School Year')
-                    ->options(function () {
-                        return Enrollment::distinct()
-                            ->pluck('school_year', 'school_year')
-                            ->toArray();
-                }),
-                SelectFilter::make('department_id')
-                    ->label('Department')
-                    ->options(function () {
-                        return Department::all()
-                            ->pluck('department_code', 'id')
-                            ->toArray();
-                }),
-                SelectFilter::make('registration_status')
-                ->label('Registration Status')
-                ->options([
-                    'IRREGULAR' => 'IRREGULAR',
-                    'REGULAR' => 'REGULAR',
-                ])
-            ])
+            ->filters($filters)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->hidden(fn($record) => $record->trashed()),
