@@ -13,6 +13,16 @@ class CreateEnrollment extends CreateRecord
     protected static string $resource = EnrollmentResource::class;
 
 
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction()
+                ->formId('form'),
+        ];
+    }
+
+
     protected function mutateFormDataBeforeCreate(array $data): array {
         // Assign the current logged admin/registrar as encoder of the enrollment
         $userId = auth()->id();
@@ -64,4 +74,6 @@ class CreateEnrollment extends CreateRecord
             sprintf('%s-%s', $startYear, $endYear)
         );
     }
+
+
 }

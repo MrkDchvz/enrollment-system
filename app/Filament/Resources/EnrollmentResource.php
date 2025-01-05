@@ -150,9 +150,11 @@ class EnrollmentResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\Action::make('pdf')
+                    ->hidden(fn($record) => $record->trashed())
                     ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
                     ->label('Download COR')
                     ->color('danger')
