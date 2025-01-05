@@ -19,8 +19,6 @@ class InstructorResource extends Resource
 {
     protected static ?string $model = Instructor::class;
 
-    protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationGroup = 'Academic Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';
@@ -39,20 +37,16 @@ class InstructorResource extends Resource
                 Tables\Columns\Layout\Split::make([
                     Tables\Columns\Layout\Stack::make([
                         Tables\Columns\TextColumn::make('name')
-                            ->searchable()
+                            ->searchable(isIndividual: true)
                             ->sortable()
                             ->weight('medium')
                             ->alignLeft(),
-
-                        Tables\Columns\TextColumn::make('department.department_name')
-                            ->color('gray')
-                            ->alignLeft()
                     ])->space(),
 
                     Tables\Columns\Layout\Stack::make([
                         Tables\Columns\TextColumn::make('email')
                             ->icon('heroicon-o-envelope')
-                            ->searchable()
+                            ->searchable(isIndividual: true)
                             ->sortable()
                             ->alignLeft(),
                         Tables\Columns\TextColumn::make('contact_number')
@@ -62,10 +56,8 @@ class InstructorResource extends Resource
                 ])
 
             ])
-            ->filters([
-                SelectFilter::make('department')
-                    ->relationship('department', 'department_name')
-            ])
+            ->defaultSort('created_at', 'desc')
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -94,11 +86,6 @@ class InstructorResource extends Resource
 
     public static function getDetailsFormSchema(): array {
         return [
-            Forms\Components\Select::make('department_id')
-                ->label('Department')
-                ->relationship('department', 'department_name')
-                ->required()
-                ->native(false),
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()']),
@@ -106,7 +93,13 @@ class InstructorResource extends Resource
                 ->email()
                 ->required(),
             Forms\Components\TextInput::make('contact_number')
-                ->required()
+                ->tel()
+                ->prefix('+63')
+                ->telRegex('/^9\d{9}$/')
+                // Removed Users as table here Check for bugs
+                ->unique(ignoreRecord: true)
+                ->placeholder("9171234567")
+                ->required(),
         ];
     }
 }

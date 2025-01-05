@@ -16,14 +16,11 @@ class Instructor extends Model
 
     protected $fillable = [
         'name',
-        'department_id',
         'email',
         'contact_number',
     ];
 
-    public function department() : BelongsTo {
-        return $this->belongsTo(Department::class);
-    }
+
 
 
 

@@ -17,9 +17,7 @@ class InstructorFactory extends Factory
      */
     public function definition(): array
     {
-        $department = DB::table('departments')->inRandomOrder()->first();
         return [
-            'department_id' => $department->id,
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             //Philippine Number Regex

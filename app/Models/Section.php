@@ -13,7 +13,6 @@ class Section extends Model
         'department_id',
         'year_level',
         'class_number',
-        'school_year'
     ];
 
     public function department() : BelongsTo {
@@ -39,28 +38,4 @@ class Section extends Model
             )
         );
     }
-
-    protected function classNumberAndYearLevel() : Attribute {
-        return Attribute::make(
-            get: fn ($value, $attributes) => trim(
-                sprintf("%d-%d",
-                $attributes['year_level'],
-                $attributes['class_number'])
-            )
-        );
-    }
-
-    protected function fullSectionName() : Attribute {
-        return Attribute::make(
-            get: fn ($value, $attributes) => trim(
-                sprintf("%s %d-%d %s",
-                    $this->department->department_code,
-                    preg_replace('/\D/', '', $attributes['year_level']),
-                    $attributes['class_number'],
-                    $attributes['school_year']
-                )
-            )
-        );
-    }
-
 }

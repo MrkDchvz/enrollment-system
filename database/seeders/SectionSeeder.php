@@ -52,28 +52,24 @@ class SectionSeeder extends Seeder
             for ($j = 1; $j <= $totalClassNumbers; $j++) {
                 DB::table('sections')->insert([
                     'department_id' => $CS_Department->id,
-                    'school_year' => $schoolYear,
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                     ]);
 
                 DB::table('sections')->insert([
                     'department_id' => $IT_Department->id,
-                    'school_year' => $schoolYear,
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                 ]);
 
                 DB::table('sections')->insert([
                     'department_id' => $CS_Department->id,
-                    'school_year' =>  "2023-2024",
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                 ]);
 
                 DB::table('sections')->insert([
                     'department_id' => $IT_Department->id,
-                    'school_year' => "2023-2024",
                     'class_number' => $j,
                     'year_level' => $yearLevel,
                 ]);

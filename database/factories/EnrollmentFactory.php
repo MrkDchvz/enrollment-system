@@ -23,6 +23,7 @@ class EnrollmentFactory extends Factory
      */
     public function definition(): array
     {
+        $schoolYear = static::getCurrentSchoolYear();
 
         try {
             // Attempt to fetch a random section
@@ -43,13 +44,11 @@ class EnrollmentFactory extends Factory
                 'department_id' => $randomDepartment->id,
                 'year_level' => $this->faker->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
                 'class_number' => $this->faker->numberBetween(1, 10),
-                'school_year' => static::getCurrentSchoolYear(),
             ]);
         }
         // This ensures that the department, yearlevel, schoolYear is the same with the section
         $department = $section->department;
         $yearLevel = $section->year_level;
-        $schoolYear = $section->school_year;
 
         try {
             $user = User::role('Admin')->inRandomOrder()->firstOrFail();

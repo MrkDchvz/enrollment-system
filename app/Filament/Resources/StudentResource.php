@@ -46,8 +46,6 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $recordTitleAttribute = 'student_number';
-
     protected static ?string $navigationGroup = 'Student Management';
 
 
@@ -74,7 +72,7 @@ class StudentResource extends Resource
     {
         $filters = [];
 
-        if (auth()->user()->hasRole('Admin')) {
+        if (auth()->user()->hasRole(['Admin', 'Officer'])) {
             $filters = [
                 SelectFilter::make('gender')
                         // Key (in the database) => Display in the forms

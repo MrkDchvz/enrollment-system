@@ -117,12 +117,11 @@ it('can soft delete a record', function () {
     ]);
 });
 
-// Test SectionID manually as it cannot be tested automatically because it's where the department, school_year, and year_level came from
 it('can validate required', function(string $column) {
     livewire(CreateEnrollment::class)
         ->fillForm([$column => null])
         ->assertActionExists('create')
         ->call('create')
         ->assertHasFormErrors([$column => ['required']]);
-})->with(['student_id', 'registration_status', 'semester', 'old_new_student']);
+})->with(['student_id', 'registration_status', 'semester', 'old_new_student', 'section_id']);
 

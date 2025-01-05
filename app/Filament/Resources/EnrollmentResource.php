@@ -59,6 +59,39 @@ class EnrollmentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $filters = [];
+
+        if (auth()->user()->hasRole(['Admin', 'Registrar'])) {
+           $filters = [
+                SelectFilter::make('semester')
+                    // Key (in the database) => Display in the forms
+                    ->options([
+                        '1st Semester' => '1st Semester',
+                        '2nd Semester' => '2nd Semester',
+                    ]),
+                SelectFilter::make('school_year')
+                    ->label('School Year')
+                    ->options(function () {
+                        return Enrollment::distinct()
+                            ->pluck('school_year', 'school_year')
+                            ->toArray();
+                    }),
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->options(function () {
+                        return Department::all()
+                            ->pluck('department_code', 'id')
+                            ->toArray();
+                    }),
+                SelectFilter::make('registration_status')
+                    ->label('Registration Status')
+                    ->options([
+                        'IRREGULAR' => 'IRREGULAR',
+                        'REGULAR' => 'REGULAR',
+                    ]),
+              ];
+        }
+
         return $table
             ->recordAction(null)
             ->searchable(false)
@@ -112,43 +145,18 @@ class EnrollmentResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable(),
             ])
-            ->filters([
-                SelectFilter::make('semester')
-                    // Key (in the database) => Display in the forms
-                    ->options([
-                        '1st Semester' => '1st Semester',
-                        '2nd Semester' => '2nd Semester',
-                    ]),
-                SelectFilter::make('school_year')
-                    ->label('School Year')
-                    ->options(function () {
-                        return Enrollment::distinct()
-                            ->pluck('school_year', 'school_year')
-                            ->toArray();
-                }),
-                SelectFilter::make('department_id')
-                    ->label('Department')
-                    ->options(function () {
-                        return Department::all()
-                            ->pluck('department_code', 'id')
-                            ->toArray();
-                }),
-                SelectFilter::make('registration_status')
-                ->label('Registration Status')
-                ->options([
-                    'IRREGULAR' => 'IRREGULAR',
-                    'REGULAR' => 'REGULAR',
-                ])
-            ])
+            ->filters($filters)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\Action::make('pdf')
+                    ->hidden(fn($record) => $record->trashed())
                     ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
-                    ->label('Download PDF')
+                    ->label('Download COR')
                     ->color('danger')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn (Enrollment $record) => route('pdf', $record))
@@ -192,7 +200,7 @@ class EnrollmentResource extends Resource
                         ->label('Year Level'),
                     TextEntry::make('semester')
                         ->label('Semester'),
-                    TextEntry::make('section.classNumberAndYearLevel')
+                    TextEntry::make('section.fullName')
                         ->label('Section'),
                     TextEntry::make('registration_status')
                         ->label('Registration Status')
@@ -351,22 +359,23 @@ class EnrollmentResource extends Resource
             Forms\Components\Grid::make(3)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
-                    ->options(Section::all()->pluck('fullSectionName', 'id'))
+                    ->options(Section::all()->pluck('sectionName', 'id'))
                     ->searchable()
                     ->reactive()
                     ->afterstateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
-                        $section = Section::find($get('section_id'));
-                        $departmentId = $section->department->id;
-                        $yearLevel = $section->year_level;
-
-                        if ($get('semester') && $state) {
-                            $set('courseEnrollments', static::populateCourse(
-                                $get('semester'),
-                                $departmentId,
-                                $yearLevel
-                            ));
+                        if ($state) {
+                            $section = Section::find($get('section_id'));
+                            $departmentId = $section->department->id;
+                            $yearLevel = $section->year_level;
+                            if ($get('semester')) {
+                                $set('courseEnrollments', static::populateCourse(
+                                    $get('semester'),
+                                    $departmentId,
+                                    $yearLevel
+                                ));
+                            }
+                            $set('enrollmentFees', static::populateFees($yearLevel));
                         }
-                        $set('enrollmentFees', static::populateFees($yearLevel));
 
                     })
                     ->required(),
@@ -468,6 +477,7 @@ class EnrollmentResource extends Resource
                         'md' => 1
                     ]),
             ])
+                ->required()
                 ->addActionLabel('Add course')
                 ->hiddenLabel()
                 ->columns([
@@ -512,6 +522,7 @@ class EnrollmentResource extends Resource
                     ->required()
                     ->prefix("₱")
             ])
+            ->required()
             ->addActionLabel('Add Fee')
             ->hiddenLabel()
             ->defaultItems(0);
@@ -557,8 +568,6 @@ class EnrollmentResource extends Resource
             Section::where('department_id', $departmentId)
                 ->where('year_level', $yearLevel)
                 ->where('class_number', $classNumber)
-                // Get the section of the current school Year
-                ->where('school_year', static::getCurrentSchoolYear())
                 ->first();
         return $newSection->id;
     }
@@ -624,7 +633,8 @@ class EnrollmentResource extends Resource
         switch ($year_level) {
             case '1st Year':
                 $fees = Fee::selectRaw('id as fee_id, amount')
-                        ->get()
+                    ->whereNot('name', 'Late Reg.')
+                    ->get()
                         ->toArray();
                 break;
             case '3rd Year':
@@ -642,8 +652,4 @@ class EnrollmentResource extends Resource
         }
         return $fees;
     }
-
-
-
-
 }

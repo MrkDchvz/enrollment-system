@@ -32,10 +32,12 @@ class DatabaseSeeder extends Seeder
             FeeSeeder::class,
             CourseSeeder::class,
             RoleSeeder::class,
+            StudentSeeder::class,
+            InstructorSeeder::class,
             PopulatorSeeder::class,
         ]);
 
-        Instructor::factory()->count(10)->create();
+//        Instructor::factory()->count(10)->create();
 
 
         // Create an Admin Account
@@ -68,19 +70,19 @@ class DatabaseSeeder extends Seeder
             ]);
 
 
-        // Create a Student Account
-        Role::firstOrCreate(
-            ['name' => 'Student'],
-            ['guard_name' => 'web']
-        );
-        $student = Student::factory()
-            ->count(10)
-            ->afterCreating(function ($student) {
-                Enrollment::factory()->create([
-                    'student_id' => $student->id,
-                ]);
-            })
-            ->create();
+//         Create a Student Account
+//        Role::firstOrCreate(
+//            ['name' => 'Student'],
+//            ['guard_name' => 'web']
+//        );
+//        $student = Student::factory()
+//            ->count(10)
+//            ->afterCreating(function ($student) {
+//                Enrollment::factory()->create([
+//                    'student_id' => $student->id,
+//                ]);
+//            })
+//            ->create();
 
     }
 }

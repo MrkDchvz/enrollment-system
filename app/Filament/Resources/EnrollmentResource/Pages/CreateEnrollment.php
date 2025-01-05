@@ -13,6 +13,16 @@ class CreateEnrollment extends CreateRecord
     protected static string $resource = EnrollmentResource::class;
 
 
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction()
+                ->formId('form'),
+        ];
+    }
+
+
     protected function mutateFormDataBeforeCreate(array $data): array {
         // Assign the current logged admin/registrar as encoder of the enrollment
         $userId = auth()->id();
@@ -24,11 +34,12 @@ class CreateEnrollment extends CreateRecord
         $section = Section::find($data['section_id']);
 
         $departmentId = $section->department->id;
-        $school_year = $section->school_year;
         $year_level = $section->year_level;
 
-        $data['school_year'] = $school_year;
+
+
         $data['year_level'] = $year_level;
+        $data['school_year'] = static::getCurrentSchoolYear();
         $data['department_id'] = $departmentId;
 
 
@@ -39,4 +50,30 @@ class CreateEnrollment extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+    public static function getCurrentSchoolYear() : string {
+        // Current Date
+        $date = Carbon::now();
+        // Current Year $ Month
+        $year = $date->year;
+        $month = $date->month;
+        // Set a new school year if the enrollment is in around august
+        // If the year is 2024 and the student enrolled around august 2024
+        // Then the school year will be 2024 - 2024
+        if ($month >= 8) {
+            $startYear = $date->year;
+            $endYear = $date->year + 1;
+        }
+        // Retain the current school year if the enrollment is around february
+        // If the year is 2024 and the student enrolled around february 2024
+        // Then the school year is 2023-2024
+        else {
+            $startYear = $date->year - 1;
+            $endYear = $date->year;
+        }
+        return trim(
+            sprintf('%s-%s', $startYear, $endYear)
+        );
+    }
+
+
 }
