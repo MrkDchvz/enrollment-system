@@ -148,7 +148,7 @@ class EnrollmentResource extends Resource
                     ->hidden(fn($record) => $record->trashed()),
                 Tables\Actions\Action::make('pdf')
                     ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
-                    ->label('Download PDF')
+                    ->label('Download COR')
                     ->color('danger')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn (Enrollment $record) => route('pdf', $record))
@@ -192,7 +192,7 @@ class EnrollmentResource extends Resource
                         ->label('Year Level'),
                     TextEntry::make('semester')
                         ->label('Semester'),
-                    TextEntry::make('section.classNumberAndYearLevel')
+                    TextEntry::make('section.fullName')
                         ->label('Section'),
                     TextEntry::make('registration_status')
                         ->label('Registration Status')
@@ -351,22 +351,23 @@ class EnrollmentResource extends Resource
             Forms\Components\Grid::make(3)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
-                    ->options(Section::all()->pluck('fullSectionName', 'id'))
+                    ->options(Section::all()->pluck('sectionName', 'id'))
                     ->searchable()
                     ->reactive()
                     ->afterstateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
-                        $section = Section::find($get('section_id'));
-                        $departmentId = $section->department->id;
-                        $yearLevel = $section->year_level;
-
-                        if ($get('semester') && $state) {
-                            $set('courseEnrollments', static::populateCourse(
-                                $get('semester'),
-                                $departmentId,
-                                $yearLevel
-                            ));
+                        if ($state) {
+                            $section = Section::find($get('section_id'));
+                            $departmentId = $section->department->id;
+                            $yearLevel = $section->year_level;
+                            if ($get('semester')) {
+                                $set('courseEnrollments', static::populateCourse(
+                                    $get('semester'),
+                                    $departmentId,
+                                    $yearLevel
+                                ));
+                            }
+                            $set('enrollmentFees', static::populateFees($yearLevel));
                         }
-                        $set('enrollmentFees', static::populateFees($yearLevel));
 
                     })
                     ->required(),
@@ -557,8 +558,6 @@ class EnrollmentResource extends Resource
             Section::where('department_id', $departmentId)
                 ->where('year_level', $yearLevel)
                 ->where('class_number', $classNumber)
-                // Get the section of the current school Year
-                ->where('school_year', static::getCurrentSchoolYear())
                 ->first();
         return $newSection->id;
     }
@@ -624,7 +623,8 @@ class EnrollmentResource extends Resource
         switch ($year_level) {
             case '1st Year':
                 $fees = Fee::selectRaw('id as fee_id, amount')
-                        ->get()
+                    ->whereNot('name', 'Late Reg.')
+                    ->get()
                         ->toArray();
                 break;
             case '3rd Year':

@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('year_level', ["1st Year","2nd Year","3rd Year","4th Year"]);
             $table->integer('class_number');
-            $table->string('school_year');
             $table->timestamps();
         });
     }
