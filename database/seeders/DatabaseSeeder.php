@@ -33,10 +33,11 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             RoleSeeder::class,
             StudentSeeder::class,
+            InstructorSeeder::class,
             PopulatorSeeder::class,
         ]);
 
-        Instructor::factory()->count(10)->create();
+//        Instructor::factory()->count(10)->create();
 
 
         // Create an Admin Account
@@ -69,7 +70,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
 
-        // Create a Student Account
+//         Create a Student Account
 //        Role::firstOrCreate(
 //            ['name' => 'Student'],
 //            ['guard_name' => 'web']

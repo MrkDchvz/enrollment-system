@@ -90,9 +90,10 @@ class StudentSeeder extends Seeder
     public function generateEmail($first_name, $last_name): string {
         $cleaned_first_name = str_replace(' ', '',strtolower($first_name));
         $cleaned_last_name = str_replace(' ', '',strtolower($last_name));
-        $domain = 'gmail.com';
+        $prefix = 'bc';
+        $domain = 'cvsu.edu.ph';
 
-        return $cleaned_first_name . $cleaned_last_name . '@' . $domain;
+        return $prefix . '.' . $cleaned_first_name . '.' . $cleaned_last_name . '@' . $domain;
     }
 
     public function generateBirthay() {
