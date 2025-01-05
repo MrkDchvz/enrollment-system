@@ -19,8 +19,6 @@ class InstructorResource extends Resource
 {
     protected static ?string $model = Instructor::class;
 
-    protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationGroup = 'Academic Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';

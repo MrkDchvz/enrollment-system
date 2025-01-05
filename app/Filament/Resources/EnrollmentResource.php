@@ -644,8 +644,4 @@ class EnrollmentResource extends Resource
         }
         return $fees;
     }
-
-
-
-
 }
