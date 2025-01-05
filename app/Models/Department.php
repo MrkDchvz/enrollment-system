@@ -14,7 +14,4 @@ class Department extends Model
         return $this->hasMany(Enrollment::class);
     }
 
-    public function instructors (): HasMany {
-        return $this->hasMany(Instructor::Class);
-    }
 }
