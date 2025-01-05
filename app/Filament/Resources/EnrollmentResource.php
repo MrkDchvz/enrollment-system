@@ -469,6 +469,7 @@ class EnrollmentResource extends Resource
                         'md' => 1
                     ]),
             ])
+                ->required()
                 ->addActionLabel('Add course')
                 ->hiddenLabel()
                 ->columns([
@@ -513,6 +514,7 @@ class EnrollmentResource extends Resource
                     ->required()
                     ->prefix("₱")
             ])
+            ->required()
             ->addActionLabel('Add Fee')
             ->hiddenLabel()
             ->defaultItems(0);
