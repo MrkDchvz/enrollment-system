@@ -21,7 +21,8 @@ class LatestStudent extends BaseWidget
                 TextColumn::make('student_number'),
                 TextColumn::make('fullName'),
                 TextColumn::make('gender'),
-                TextColumn::make('date_of_birth'),
+                TextColumn::make('date_of_birth')
+                    ->date('F j, Y'),
                 TextColumn::make('email'),
                 TextColumn::make('contact_number'),
                 TextColumn::make('address'),
