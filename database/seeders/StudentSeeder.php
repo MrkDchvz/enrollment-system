@@ -19,7 +19,7 @@ class StudentSeeder extends Seeder
     {
         $studentsList = [
             ['first_name' => 'Raven', 'last_name' => 'Ampere', 'student_number' => 202211661, 'gender' => 'MALE'],
-            ['first_name' => 'John Vincent', 'last_name' => 'Ariño', 'student_number' => 202211668, 'gender' => 'MALE'],
+            ['first_name' => 'John Vincent', 'last_name' => 'AriÑo', 'student_number' => 202211668, 'gender' => 'MALE'],
             ['first_name' => 'Renlly', 'last_name' => 'Bacolina', 'student_number' => 202211672, 'gender' => 'MALE'],
             ['first_name' => 'Bryan', 'last_name' => 'Bergonia', 'student_number' => 202211682, 'gender' => 'MALE'],
             ['first_name' => 'Christopher Sebastian', 'last_name' => 'Candava', 'student_number' => 202211702, 'gender' => 'MALE'],
