@@ -200,7 +200,7 @@ class EnrollmentResource extends Resource
                         ->label('Year Level'),
                     TextEntry::make('semester')
                         ->label('Semester'),
-                    TextEntry::make('section.fullName')
+                    TextEntry::make('section.sectionName')
                         ->label('Section'),
                     TextEntry::make('registration_status')
                         ->label('Registration Status')
