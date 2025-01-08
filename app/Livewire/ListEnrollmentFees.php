@@ -35,7 +35,7 @@ class ListEnrollmentFees extends Component implements HasForms, HasTable
                     ->alignment('center'),
                 textColumn::make('amount')
                     ->formatStateUsing(fn ($state) => '₱' . $state)
-                    ->label('Amount in Pesos')
+                    ->label('Amount')
                     ->alignment('center'),
             ]);
 
