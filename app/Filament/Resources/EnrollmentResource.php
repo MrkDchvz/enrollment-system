@@ -25,6 +25,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -93,10 +94,11 @@ class EnrollmentResource extends Resource
         }
 
         return $table
-            ->recordAction(null)
+            ->recordUrl(null)
             ->searchable(false)
             ->defaultSort('created_at', 'desc')
             ->columns([
+                \EightyNine\Approvals\Tables\Columns\ApprovalStatusColumn::make("approvalStatus.status"),
                 Tables\Columns\TextColumn::make('student.student_number')
                     ->label('Student Number')
                     ->searchable(isIndividual: true),
@@ -143,25 +145,28 @@ class EnrollmentResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Encoder')
                     ->searchable(isIndividual: true)
-                    ->toggleable(),
+                    ->toggleable()
+                ,
             ])
             ->filters($filters)
-            ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\EditAction::make()
-                    ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\Action::make('pdf')
-                    ->hidden(fn($record) => $record->trashed())
-                    ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
-                    ->label('Download COR')
-                    ->color('danger')
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->url(fn (Enrollment $record) => route('pdf', $record))
-                    ->openUrlInNewTab(),
-            ], position: ActionsPosition::BeforeColumns);
+            ->actions(
+                \EightyNine\Approvals\Tables\Actions\ApprovalActions::make(
+                    Action::make('pdf')
+                        ->hidden(fn($record) => auth()->user()->hasRole(['Admin']))
+                        ->label('Download COR')
+                        ->color('danger')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->url(fn (Enrollment $record) => route('pdf', $record))
+                        ->openUrlInNewTab(),
+                    [
+                        Tables\Actions\ForceDeleteAction::make(),
+                        Tables\Actions\RestoreAction::make(),
+                        Tables\Actions\EditAction::make()
+                            ->hidden(fn($record) => $record->trashed()),
+                    ],
+                ),
+                 position: ActionsPosition::BeforeColumns,
+            );
     }
 
     public static function getEloquentQuery(): Builder
