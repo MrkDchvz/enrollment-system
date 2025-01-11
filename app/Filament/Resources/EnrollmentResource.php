@@ -151,8 +151,8 @@ class EnrollmentResource extends Resource
             ->filters($filters)
             ->actions(
                 \EightyNine\Approvals\Tables\Actions\ApprovalActions::make(
-                    Action::make('pdf')
-                        ->hidden(fn($record) => auth()->user()->hasRole(['Admin']))
+                    Tables\Actions\Action::make('pdf')
+                        ->hidden(fn($record) => auth()->user()->hasRole(['Officer', 'Student']))
                         ->label('Download COR')
                         ->color('danger')
                         ->icon('heroicon-o-document-arrow-down')
