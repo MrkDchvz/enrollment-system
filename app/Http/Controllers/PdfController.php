@@ -12,6 +12,7 @@ class PdfController extends Controller
     public function __invoke(Enrollment $enrollment)
     {
         return Pdf::loadView('pdf', ['record' => $enrollment])
+            // Pag gusto mo download
 //            ->download($enrollment->id. '.pdf')
               ->stream()
             ;

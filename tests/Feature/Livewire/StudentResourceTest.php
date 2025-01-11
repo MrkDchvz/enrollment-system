@@ -273,7 +273,6 @@ it('passes when valid email pattern is inserted', function (string $column) {
         ->assertHasNoFormErrors([$column => ['email']]);
 })->with(['email']);
 
-
 // CONTACT NUMBER VALIDATION
 it('passes valdiation when contact number matches the regex pattern', function (string $column) {
     livewire(CreateStudent::class)

@@ -10,6 +10,7 @@
         "ext-zip": "*",
         "awcodes/filament-table-repeater": "^3.1",
         "barryvdh/laravel-dompdf": "^3.0",
+        "eightynine/filament-approvals": "^3.1",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
