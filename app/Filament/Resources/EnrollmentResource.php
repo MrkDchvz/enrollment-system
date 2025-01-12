@@ -7,6 +7,7 @@ use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
 use App\Livewire\ListEnrollmentCourses;
 use App\Livewire\ListEnrollmentFees;
+use App\Livewire\StudentChecklist;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\Department;
@@ -48,6 +49,7 @@ class EnrollmentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $id = request()->route()->parameter('record');
         return $form
             ->schema([
                 Forms\Components\Section::make('Student Information')
@@ -93,9 +95,6 @@ class EnrollmentResource extends Resource
                         'IRREGULAR' => 'IRREGULAR',
                         'REGULAR' => 'REGULAR',
                     ]),
-               SelectFilter::make('approvalStatus')
-               ->label('Approval Status')
-               ->relationship('approvalStatus', 'status',),
               ];
         }
 
@@ -253,6 +252,11 @@ class EnrollmentResource extends Resource
                     TextEntry::make('user.name')
                         ->label('Encoder'),
                 ])->columns(3),
+                Fieldset::make('Checklist')->schema([
+                    Livewire::make(StudentChecklist::class, ['studentId' => Enrollment::find($enrollmentId)->student_id])
+                        ->columnSpanFull(),
+                ])
+                ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Faculty'])),
                 Fieldset::make('Courses')->schema([
                     Livewire::make(ListEnrollmentCourses::class, ['enrollmentId' => $enrollmentId])
                         ->columnSpanFull(),
@@ -260,7 +264,7 @@ class EnrollmentResource extends Resource
                 Fieldset::make('Fees')->schema([
                     Livewire::make(ListEnrollmentFees::class, ['enrollmentId' => $enrollmentId])
                         ->columnSpanFull(),
-                ])
+                ]),
             ]);
     }
 
@@ -409,13 +413,7 @@ class EnrollmentResource extends Resource
 
 
             ]),
-            Forms\Components\Grid::make(3)->schema([
-                Forms\Components\ToggleButtons::make('registration_status')
-                    ->inline()
-                    ->label('Registration Status')
-                    ->options(RegistrationStatus::class)
-                    ->required(),
-
+            Forms\Components\Grid::make(2)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(Section::all()->pluck('sectionName', 'id'))
@@ -434,10 +432,30 @@ class EnrollmentResource extends Resource
                                 ));
                             }
                             $set('enrollmentFees', static::populateFees($yearLevel));
+                            $sectionPoupulation = Enrollment::where('section_id', $get('section_id'))
+                            ->where('school_year', static::getCurrentSchoolYear())
+                            ->where('semester', $get('semester'))
+                            ->whereHas('approvalStatus', function ($query) {
+                                $query->where('status', 'Approved');
+                            })
+                            ->count();
+                            $set('section_population', $sectionPoupulation);
                         }
 
                     })
                     ->required(),
+                Forms\Components\TextInput::make('section_population')
+                    ->label('Section Population')
+                    ->disabled()
+            ])
+                ->hidden(fn ($state) => !auth()->user()->hasRole(['Admin','Faculty','Registrar'])),
+            Forms\Components\Grid::make(2)->schema([
+                Forms\Components\ToggleButtons::make('registration_status')
+                    ->inline()
+                    ->label('Registration Status')
+                    ->options(RegistrationStatus::class)
+                    ->required(),
+
 
                 Forms\Components\Select::make('old_new_student')
                     ->label('Old/New Student')

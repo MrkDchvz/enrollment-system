@@ -61,7 +61,7 @@ class CreateEnrollment extends CreateRecord
 //                ->whereHas('approvalStatus', function ($query) {
 //                    $query->whereIn('status', ['Approved', 'Created', 'Submitted']);
 //                })
-//                ->first()->approvalStatus);
+//                ->first()->approvals);
             if ($onGoingEnrollment) {
                 Notification::make()
                     ->warning()
