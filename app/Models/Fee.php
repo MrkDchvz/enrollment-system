@@ -13,6 +13,4 @@ class Fee extends Model
         return $this->belongsToMany(Enrollment::class);
     }
 
-
-
 }
