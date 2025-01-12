@@ -10,6 +10,7 @@
         "ext-zip": "*",
         "awcodes/filament-table-repeater": "^3.1",
         "barryvdh/laravel-dompdf": "^3.0",
+        "eightynine/filament-approvals": "^3.1",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
@@ -28,11 +29,17 @@
         "pestphp/pest-plugin-livewire": "^3.0"
     },
     "autoload": {
+        "exclude-from-classmap": [
+            "vendor/eightynine/filament-approvals/src/Filament/Resources/ApprovalFlowResource.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Overrides/eightynine/filament-approvals/src/Filament/Resources/ApprovalFlowResource.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use EightyNine\Approvals\Models\ApprovableModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Enrollment extends Model
+class Enrollment extends ApprovableModel
 {
     /** @use HasFactory<\Database\Factories\EnrollmentFactory> */
     use HasFactory;

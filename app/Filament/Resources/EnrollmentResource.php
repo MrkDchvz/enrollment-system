@@ -7,6 +7,7 @@ use App\Filament\Resources\EnrollmentResource\Pages;
 use App\Filament\Resources\EnrollmentResource\RelationManagers;
 use App\Livewire\ListEnrollmentCourses;
 use App\Livewire\ListEnrollmentFees;
+use App\Livewire\StudentChecklist;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\Department;
@@ -14,6 +15,7 @@ use App\Models\Enrollment;
 use App\Models\Fee;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\User;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Carbon\Carbon;
@@ -25,6 +27,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -46,14 +49,17 @@ class EnrollmentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $id = request()->route()->parameter('record');
         return $form
             ->schema([
                 Forms\Components\Section::make('Student Information')
-                ->schema(static::getDetailsFormSchema()),
+                    ->schema(static::getDetailsFormSchema()),
                 Forms\Components\Section::make('Courses')
-                ->schema([static::getCourseRepeater()]),
+                    ->schema([static::getCourseRepeater()])
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Faculty', 'Registrar'])),
                 Forms\Components\Section::make('Fees')
-                    ->schema([static::getFeeRepeater()]),
+                    ->schema([static::getFeeRepeater()])
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
             ]);
     }
 
@@ -93,10 +99,11 @@ class EnrollmentResource extends Resource
         }
 
         return $table
-            ->recordAction(null)
+            ->recordUrl(null)
             ->searchable(false)
             ->defaultSort('created_at', 'desc')
             ->columns([
+                \EightyNine\Approvals\Tables\Columns\ApprovalStatusColumn::make("approvalStatus.status"),
                 Tables\Columns\TextColumn::make('student.student_number')
                     ->label('Student Number')
                     ->searchable(isIndividual: true),
@@ -114,10 +121,12 @@ class EnrollmentResource extends Resource
                         'IRREGULAR' => 'heroicon-o-arrow-path-rounded-square', // Icon for irregular
                         'REGULAR' => 'heroicon-o-check',        // Icon for regular
                     })
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('enrollment_date')
                     ->label('Enrollment Date')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('department.department_code')
                     ->label('Department')
                     ->badge()
@@ -125,43 +134,67 @@ class EnrollmentResource extends Resource
                         'BSIT' => 'success',
                         'BSCS' => 'danger',
                     })
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('year_level')
                     ->label('Year Level')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('semester')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('section.sectionName')
                     ->label('Section')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('school_year')
                     ->label('School Year')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('old_new_student')
                     ->label('Old/New Student')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Encoder')
                     ->searchable(isIndividual: true)
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
+
             ])
             ->filters($filters)
-            ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\EditAction::make()
-                    ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\Action::make('pdf')
-                    ->hidden(fn($record) => $record->trashed())
-                    ->visible(fn() => auth()->user()->hasRole(['Admin', 'Registrar']))
-                    ->label('Download COR')
-                    ->color('danger')
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->url(fn (Enrollment $record) => route('pdf', $record))
-                    ->openUrlInNewTab(),
-            ], position: ActionsPosition::BeforeColumns);
+            ->actions(
+                \EightyNine\Approvals\Tables\Actions\ApprovalActions::make(
+                    Tables\Actions\Action::make('pdf')
+                        // Negate if the enrollment is valid
+                        // because the logic of hidden is it hides the component if it returns true
+                        // I don't want to hide the enrollment if its valid
+                        // Since the function isEnrollmentValid returns true if enrollment valid
+                        //  hidden function hides the component if its true
+                        // I have to negate it so it wont hide the COR if the enrollment is valid
+                        ->hidden(function ($record) {
+                            if (auth()->user()->hasRole(['Registrar'])) {
+                                return !static::isEnrollmentValid($record->id);
+                            }
+                            if (auth()->user()->hasRole(['Admin'])) {
+                                return false;
+                            }
+                            // Hide the button for Student, Officer, Faculty.
+                            return true;
+                        })
+                        ->label('Download COR')
+                        ->color('danger')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->url(fn (Enrollment $record) => route('pdf', $record))
+                        ->openUrlInNewTab(),
+                    [
+                        Tables\Actions\ForceDeleteAction::make(),
+                        Tables\Actions\RestoreAction::make(),
+                        Tables\Actions\EditAction::make()
+                            ->hidden(fn($record) => $record->trashed()),
+                    ],
+                ),
+                 position: ActionsPosition::BeforeColumns,
+            );
     }
 
     public static function getEloquentQuery(): Builder
@@ -219,6 +252,11 @@ class EnrollmentResource extends Resource
                     TextEntry::make('user.name')
                         ->label('Encoder'),
                 ])->columns(3),
+                Fieldset::make('Checklist')->schema([
+                    Livewire::make(StudentChecklist::class, ['studentId' => Enrollment::find($enrollmentId)->student_id])
+                        ->columnSpanFull(),
+                ])
+                ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Faculty'])),
                 Fieldset::make('Courses')->schema([
                     Livewire::make(ListEnrollmentCourses::class, ['enrollmentId' => $enrollmentId])
                         ->columnSpanFull(),
@@ -226,7 +264,7 @@ class EnrollmentResource extends Resource
                 Fieldset::make('Fees')->schema([
                     Livewire::make(ListEnrollmentFees::class, ['enrollmentId' => $enrollmentId])
                         ->columnSpanFull(),
-                ])
+                ]),
             ]);
     }
 
@@ -256,6 +294,19 @@ class EnrollmentResource extends Resource
                     ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(5)->pluck('student_number', 'id')->toArray())
                     ->getOptionLabelUsing(fn ($value): ?string => Student::find($value)?->student_number)
                     ->required()
+                    ->disabled(fn () => !auth()->user()->hasRole('Admin'))
+                    ->native(false)
+                    ->default(function() {
+                        // If the user that is logged in is a student then use that student's info if its admin let the admin select whom to enroll
+                        if (auth()->user()->hasRole('Student')) {
+                            $userId = auth()->id();
+                            $student = Student::where('user_id', $userId)->firstOrFail();
+                            return $student->id;
+                        }
+                        else {
+                            return null;
+                        }
+                    })
                     ->reactive()
                     ->preload()
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
@@ -278,7 +329,6 @@ class EnrollmentResource extends Resource
                                 $lastRegistrationStatus = $lastEnrollment->registration_status;
                                 $lastSectionId = $lastEnrollment->section_id;
 
-
                                 // If the last/latest enrollment is 2nd semester move the year level up by 1
                                 $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
                                 // Get new section
@@ -295,7 +345,6 @@ class EnrollmentResource extends Resource
                                     $lastDepartment,
                                     $newYearLevel
                                 ));
-
                             }
                             // Assumes that the student is a new first year student if last enrollment is not found
                             // In other words if a student has no enrollment data the system will assume that the student is 1st year
@@ -316,31 +365,33 @@ class EnrollmentResource extends Resource
 
                         }
 
-                    })
-                    ->native(false),
+                    }),
                 Forms\Components\TextInput::make('student_name')
                     ->label('Student Name')
+                    ->default(function () {
+                        // If the user is student then set the user's student name  by default
+                        if (auth()->user()->hasRole('Student')) {
+                            $userId = auth()->id();
+                            return Student::where('user_id', $userId)->firstOrFail()->fullName;
+                        }
+                        else {
+                            return null;
+                        }
+                    })
                     ->disabled(),
             ]),
+            // Only Visible to student
             Forms\Components\Grid::make(2)->schema([
-                Forms\Components\ToggleButtons::make('registration_status')
-                    ->inline()
-                    ->label('Registration Status')
-                    ->options(RegistrationStatus::class)
-                    ->required(),
-
-                Forms\Components\ToggleButtons::make('semester')
+                Forms\Components\Select::make('semester')
                     ->label('Semester')
                     ->options([
                         '1st Semester' => '1st Semester',
                         '2nd Semester' => '2nd Semester',
                     ])
-                    ->colors([
-                        '1st Semester' => 'info',
-                        '2nd Semester' => 'success',
-                    ])
-                    ->inline()
                     ->required()
+                    ->default(fn () => static::getCurrentSemester())
+                    ->disabled(fn () => !auth()->user()->hasRole('Admin'))
+                    ->selectablePlaceholder(false)
                     ->reactive()
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
                         if($get('section_id') && $state) {
@@ -355,8 +406,14 @@ class EnrollmentResource extends Resource
                             ));
                         }
                     }),
+                Forms\Components\TextInput::make('school_year')
+                    ->label('School Year')
+                    ->disabled()
+                    ->default(static::getCurrentSchoolYear()),
+
+
             ]),
-            Forms\Components\Grid::make(3)->schema([
+            Forms\Components\Grid::make(2)->schema([
                 Forms\Components\Select::make('section_id')
                     ->label('Section')
                     ->options(Section::all()->pluck('sectionName', 'id'))
@@ -375,10 +432,30 @@ class EnrollmentResource extends Resource
                                 ));
                             }
                             $set('enrollmentFees', static::populateFees($yearLevel));
+                            $sectionPoupulation = Enrollment::where('section_id', $get('section_id'))
+                            ->where('school_year', static::getCurrentSchoolYear())
+                            ->where('semester', $get('semester'))
+                            ->whereHas('approvalStatus', function ($query) {
+                                $query->where('status', 'Approved');
+                            })
+                            ->count();
+                            $set('section_population', $sectionPoupulation);
                         }
 
                     })
                     ->required(),
+                Forms\Components\TextInput::make('section_population')
+                    ->label('Section Population')
+                    ->disabled()
+            ])
+                ->hidden(fn ($state) => !auth()->user()->hasRole(['Admin','Faculty','Registrar'])),
+            Forms\Components\Grid::make(2)->schema([
+                Forms\Components\ToggleButtons::make('registration_status')
+                    ->inline()
+                    ->label('Registration Status')
+                    ->options(RegistrationStatus::class)
+                    ->required(),
+
 
                 Forms\Components\Select::make('old_new_student')
                     ->label('Old/New Student')
@@ -387,11 +464,17 @@ class EnrollmentResource extends Resource
                         'New Student' => 'New Student',
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('school_year')
-                    ->label('School Year')
-                    ->disabled()
-                    ->default(static::getCurrentSchoolYear()),
-            ]),
+            ])
+            ->hidden(fn() => auth()->user()->hasRole('Student')),
+            Forms\Components\Select::make('user_id')
+            ->label('Encoder')
+            ->options(function () {
+                return User::role('Registrar')->pluck('name', 'id')->toArray();
+            })
+            ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar']))
+            ->required()
+            ->searchable(),
+
 
         ];
     }
@@ -572,6 +655,21 @@ class EnrollmentResource extends Resource
         return $newSection->id;
     }
 
+    public static function isEnrollmentValid ($enrollmentId) {
+
+        $enrollmentModel = Enrollment::find($enrollmentId);
+//        dd($enrollmentModel->approvalStatus);
+        $nullableFields = ['user_id', 'department_id', 'section_id'];
+        // Check if enrollment user_id, department_id, section_id because enrollment needs it.
+        $allNullableFieldsHaveValues = collect($nullableFields)
+            ->every(fn($field) => !is_null($enrollmentModel->$field));
+
+        return $allNullableFieldsHaveValues &&
+            !$enrollmentModel->trashed() &&
+            $enrollmentModel->fees()->exists() &&
+            $enrollmentModel->courses()->exists();
+    }
+
     public static function getCurrentSchoolYear() : string {
         // Current Date
         $date = Carbon::now();
@@ -607,6 +705,7 @@ class EnrollmentResource extends Resource
             return "2nd Semester";
         }
     }
+
 
     public static function populateCourse($semester, $departmentId, $yearLevel) : array {
         $courses = [];

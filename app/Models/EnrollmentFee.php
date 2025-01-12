@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EnrollmentFee extends Model
 {
     protected $table = 'enrollment_fee';
-    protected $fillable = ['course_id', 'fee_id', 'amount'];
+    protected $fillable = ['enrollment_id', 'fee_id', 'amount'];
 
     public function enrollment(): BelongsTo {
         return $this->belongsTo(Enrollment::class);

@@ -59,6 +59,15 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('officer')
             ]);
 
+        // Create A Faculty Account
+        $faculty = User::factory()
+            ->afterCreating(fn ($user) => $user->assignRole('Faculty'))
+            ->create([
+                'name' => 'faculty',
+                'email' => 'faculty@gmail.com',
+                'password' => Hash::make('faculty')
+            ]);
+
 
         // Create a Registrar Account
         $registrar = User::factory()
