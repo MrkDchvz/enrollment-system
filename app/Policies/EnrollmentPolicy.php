@@ -13,7 +13,7 @@ class EnrollmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Registrar', 'Student']);
+        return $user->hasRole(['Admin', 'Registrar', 'Student', 'Faculty']);
     }
 
     /**
@@ -21,7 +21,7 @@ class EnrollmentPolicy
      */
     public function view(User $user, Enrollment $enrollment): bool
     {
-        return $user->hasRole(['Admin', 'Registrar', 'Student']);
+        return $user->hasRole(['Admin', 'Registrar', 'Student', 'Faculty']);
     }
 
     /**
@@ -29,7 +29,7 @@ class EnrollmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Registrar']);
+        return $user->hasRole(['Admin', 'Registrar', 'Faculty', 'Student']);
     }
 
     /**
@@ -37,7 +37,7 @@ class EnrollmentPolicy
      */
     public function update(User $user, Enrollment $enrollment): bool
     {
-        return $user->hasRole(['Admin']);
+        return $user->hasRole(['Admin', 'Registrar', 'Faculty']);
     }
 
     /**

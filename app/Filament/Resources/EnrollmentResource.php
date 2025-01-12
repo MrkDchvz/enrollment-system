@@ -50,11 +50,13 @@ class EnrollmentResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Student Information')
-                ->schema(static::getDetailsFormSchema()),
+                    ->schema(static::getDetailsFormSchema()),
                 Forms\Components\Section::make('Courses')
-                ->schema([static::getCourseRepeater()]),
+                    ->schema([static::getCourseRepeater()])
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Faculty', 'Registrar'])),
                 Forms\Components\Section::make('Fees')
-                    ->schema([static::getFeeRepeater()]),
+                    ->schema([static::getFeeRepeater()])
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
             ]);
     }
 
