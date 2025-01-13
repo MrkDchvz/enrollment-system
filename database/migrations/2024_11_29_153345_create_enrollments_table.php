@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('semester', ['1st Semester', '2nd Semester'])->default(self::getCurrentSemester());
             $table->string('scholarship')->nullable();
             $table->date('enrollment_date')->default(Carbon::now());
+            $table->string('requirements')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
