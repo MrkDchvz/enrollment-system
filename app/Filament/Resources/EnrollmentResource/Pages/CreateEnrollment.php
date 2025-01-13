@@ -66,7 +66,7 @@ class CreateEnrollment extends CreateRecord
                 Notification::make()
                     ->warning()
                     ->title('Unable to create a new enrollment.')
-                    ->body('A currently ongoing enrollment already exists.')
+                    ->body('Your enrollment is already being processed.')
                     ->persistent()
                     ->send();
                 $this->halt();

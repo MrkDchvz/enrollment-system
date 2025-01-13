@@ -165,6 +165,11 @@ class EnrollmentResource extends Resource
                 Tables\Columns\ImageColumn::make('requirements')
                     ->simpleLightbox()
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer'])),
+                Tables\Columns\TextColumn::make('student_type')
+                    ->label('Student Type')
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer']))
+
+
 
             ])
             ->filters($filters)
@@ -480,6 +485,24 @@ class EnrollmentResource extends Resource
             ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar']))
             ->required()
             ->searchable(),
+
+            Forms\Components\ToggleButtons::make('student_type')
+            ->label('Student Type')
+            ->options([
+                'Regular' => 'Regular',
+                'Irregular' => 'Irregular',
+                'Transferee' => 'Transferee',
+                'New' => 'New',
+            ])
+            ->icons([
+                    'Regular' => 'heroicon-o-check-circle',
+                    'Irregular' => 'heroicon-o-arrow-path-rounded-square',
+                    'Transferee' => 'heroicon-o-paper-airplane',
+                    'New' => 'heroicon-o-sparkles',
+                ])
+            ->inline()
+            ->required(),
+
             Forms\Components\FileUpload::make('requirements')
             ->label('Requirements')
             ->disk('public')

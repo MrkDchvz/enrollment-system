@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('scholarship')->nullable();
             $table->date('enrollment_date')->default(Carbon::now());
             $table->string('requirements')->nullable();
+            $table->enum('student_type', ['Irregular', 'Regular', 'Transferee', 'New']);
             $table->timestamps();
             $table->softDeletes();
         });

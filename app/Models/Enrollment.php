@@ -29,7 +29,8 @@ class Enrollment extends ApprovableModel
         'semester',
         'enrollment_date',
         'scholarship',
-        'requirements'
+        'requirements',
+        'student_type'
     ];
 
     protected $casts = [
