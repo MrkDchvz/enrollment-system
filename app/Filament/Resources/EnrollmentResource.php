@@ -20,6 +20,7 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Livewire;
@@ -60,6 +61,8 @@ class EnrollmentResource extends Resource
                 Forms\Components\Section::make('Fees')
                     ->schema([static::getFeeRepeater()])
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
+                Forms\Components\Section::make('Payments')
+                    ->schema([static::getPaymentRepeater()])
             ]);
     }
 
@@ -159,6 +162,14 @@ class EnrollmentResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable()
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
+                Tables\Columns\ImageColumn::make('requirements')
+                    ->simpleLightbox()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer'])),
+                Tables\Columns\TextColumn::make('student_type')
+                    ->label('Student Type')
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer']))
+
+
 
             ])
             ->filters($filters)
@@ -475,9 +486,70 @@ class EnrollmentResource extends Resource
             ->required()
             ->searchable(),
 
+            Forms\Components\ToggleButtons::make('student_type')
+            ->label('Student Type')
+            ->options([
+                'Regular' => 'Regular',
+                'Irregular' => 'Irregular',
+                'Transferee' => 'Transferee',
+                'New' => 'New',
+            ])
+            ->icons([
+                    'Regular' => 'heroicon-o-check-circle',
+                    'Irregular' => 'heroicon-o-arrow-path-rounded-square',
+                    'Transferee' => 'heroicon-o-paper-airplane',
+                    'New' => 'heroicon-o-sparkles',
+                ])
+            ->inline()
+            ->required(),
 
+            Forms\Components\FileUpload::make('requirements')
+            ->label('Requirements')
+            ->disk('public')
+            ->panelLayout('grid')
+            ->directory('requirements')
+            ->multiple()
+            ->required()
         ];
     }
+
+
+    public static function getPaymentRepeater(): Repeater {
+        return Repeater::make('payments')
+            ->relationship()
+            ->distinct()
+            ->schema([
+                Forms\Components\Grid::make(4)->schema([
+                    Forms\Components\Select::make('name')
+                        ->label('Payment Type')
+                        ->options([
+                            'Society Fee' => 'Society Fee',
+                        ])
+                        ->default('Society Fee')
+                        ->required(),
+                    Forms\Components\TextInput::make('reference')
+                        ->label('Reference')
+                        ->required(),
+                    Forms\Components\TextInput::make('amount')
+                        ->label('Amount')
+                        ->numeric()
+                        ->prefix("₱")
+                        ->minValue(0)
+                        ->required(),
+                    Forms\Components\ToggleButtons::make('method')
+                        ->inline()
+                        ->options([
+                            'GCash' => 'GCash',
+                        ])
+                        ->colors([
+                            'GCash' => 'info',
+                        ])
+                        ->required(),
+                ])
+            ]);
+    }
+
+
     public static function getCourseRepeater(): TableRepeater {
         return TableRepeater::make('courseEnrollments')
             ->headers([
@@ -568,6 +640,8 @@ class EnrollmentResource extends Resource
                 ])
                 ->defaultItems(0);
     }
+
+
     public static function getFeeRepeater(): TableRepeater {
         return TableRepeater::make('enrollmentFees')
             ->headers([

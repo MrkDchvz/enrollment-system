@@ -14,8 +14,13 @@ class ListEnrollments extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        $label = 'New Enrollment';
+        if (auth()->user()->hasRole('Student')) {
+            $label = 'Pre-enroll';
+        }
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label($label),
         ];
     }
 

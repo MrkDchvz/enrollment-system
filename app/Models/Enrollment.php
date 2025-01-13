@@ -28,7 +28,13 @@ class Enrollment extends ApprovableModel
         'year_level',
         'semester',
         'enrollment_date',
-        'scholarship'
+        'scholarship',
+        'requirements',
+        'student_type'
+    ];
+
+    protected $casts = [
+        'requirements' => 'array',
     ];
 
     protected function classNumber(): Attribute {
@@ -68,6 +74,15 @@ class Enrollment extends ApprovableModel
     public function enrollmentFees () : HasMany {
         return $this->hasMany(EnrollmentFee::class);
     }
+
+    public function payments () : HasMany {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function requirements () : HasMany {
+        return $this->hasMany(Requirement::class);
+    }
+
 
 
 }
