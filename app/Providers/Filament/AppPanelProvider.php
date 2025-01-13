@@ -17,6 +17,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -44,7 +45,8 @@ class AppPanelProvider extends PanelProvider
 //                Widgets\FilamentInfoWidget::class,
             ])
             ->plugins([
-                \EightyNine\Approvals\ApprovalPlugin::make()
+                \EightyNine\Approvals\ApprovalPlugin::make(),
+                SimpleLightBoxPlugin::make()
             ])
             ->middleware([
                 EncryptCookies::class,

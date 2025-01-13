@@ -162,6 +162,9 @@ class EnrollmentResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable()
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
+                Tables\Columns\ImageColumn::make('requirements')
+                    ->simpleLightbox()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer'])),
 
             ])
             ->filters($filters)
