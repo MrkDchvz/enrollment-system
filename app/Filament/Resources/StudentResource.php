@@ -45,7 +45,7 @@ use Illuminate\Validation\Rule;
 class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
-
+    protected static ?string $pluralModelLabel = 'Student Information';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
@@ -386,4 +386,5 @@ class StudentResource extends Resource
             ->hiddenLabel()
             ->defaultItems(0);
     }
+
 }

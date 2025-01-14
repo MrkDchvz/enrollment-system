@@ -69,6 +69,7 @@ class EnrollmentFactory extends Factory
             'scholarship' => $scholarship,
             'registration_status' => $this->faker->randomElement(['REGULAR', 'IRREGULAR']),
             'school_year' => $schoolYear,
+            'student_type' => $this->faker->randomElement(['Regular', 'Irregular', 'Transferee', 'New']),
             'year_level' => $yearLevel,
             'semester' => $this->faker->randomElement(['1st Semester', '2nd Semester']),
             'old_new_student' => $this->faker->randomElement(['Old Student', 'New Student']),

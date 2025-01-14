@@ -61,8 +61,6 @@ class EnrollmentResource extends Resource
                 Forms\Components\Section::make('Fees')
                     ->schema([static::getFeeRepeater()])
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
-                Forms\Components\Section::make('Payments')
-                    ->schema([static::getPaymentRepeater()])
             ]);
     }
 
@@ -167,7 +165,7 @@ class EnrollmentResource extends Resource
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer'])),
                 Tables\Columns\TextColumn::make('student_type')
                     ->label('Student Type')
-                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer']))
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer', 'Faculty']))
 
 
 
@@ -457,9 +455,10 @@ class EnrollmentResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('section_population')
                     ->label('Section Population')
+
                     ->disabled()
             ])
-                ->hidden(fn ($state) => !auth()->user()->hasRole(['Admin','Faculty','Registrar'])),
+                    ->hidden(fn ($state) => !auth()->user()->hasRole(['Admin','Faculty','Registrar'])),
             Forms\Components\Grid::make(2)->schema([
                 Forms\Components\ToggleButtons::make('registration_status')
                     ->inline()
@@ -500,6 +499,7 @@ class EnrollmentResource extends Resource
                     'Transferee' => 'heroicon-o-paper-airplane',
                     'New' => 'heroicon-o-sparkles',
                 ])
+            ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar', 'Student']))
             ->inline()
             ->required(),
 
@@ -509,45 +509,13 @@ class EnrollmentResource extends Resource
             ->panelLayout('grid')
             ->directory('requirements')
             ->multiple()
+            ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar', 'Student']))
             ->required()
         ];
     }
 
 
-    public static function getPaymentRepeater(): Repeater {
-        return Repeater::make('payments')
-            ->relationship()
-            ->distinct()
-            ->schema([
-                Forms\Components\Grid::make(4)->schema([
-                    Forms\Components\Select::make('name')
-                        ->label('Payment Type')
-                        ->options([
-                            'Society Fee' => 'Society Fee',
-                        ])
-                        ->default('Society Fee')
-                        ->required(),
-                    Forms\Components\TextInput::make('reference')
-                        ->label('Reference')
-                        ->required(),
-                    Forms\Components\TextInput::make('amount')
-                        ->label('Amount')
-                        ->numeric()
-                        ->prefix("₱")
-                        ->minValue(0)
-                        ->required(),
-                    Forms\Components\ToggleButtons::make('method')
-                        ->inline()
-                        ->options([
-                            'GCash' => 'GCash',
-                        ])
-                        ->colors([
-                            'GCash' => 'info',
-                        ])
-                        ->required(),
-                ])
-            ]);
-    }
+
 
 
     public static function getCourseRepeater(): TableRepeater {

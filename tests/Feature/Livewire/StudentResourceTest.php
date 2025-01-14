@@ -31,6 +31,7 @@ beforeEach(function () {
 
 // Form Existence
 it('student resource has a create form', function () {
+    $this->actingAsAdmin();
     livewire(CreateStudent::class)
         ->assertFormExists();
 });

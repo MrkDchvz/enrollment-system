@@ -75,14 +75,6 @@ class Enrollment extends ApprovableModel
         return $this->hasMany(EnrollmentFee::class);
     }
 
-    public function payments () : HasMany {
-        return $this->hasMany(Payment::class);
-    }
-
-    public function requirements () : HasMany {
-        return $this->hasMany(Requirement::class);
-    }
-
 
 
 }
