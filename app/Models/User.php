@@ -12,17 +12,36 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
+use Yebor974\Filament\RenewPassword\Contracts\RenewPasswordContract;
+use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
+use Yebor974\Filament\RenewPassword\Traits\RenewPassword;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, RenewPasswordContract
 {
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes, RenewPassword;
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasRole(['Admin', 'Student', 'Officer', 'Registrar', 'Faculty']);
+        return $this->hasRole(['Admin', 'Student', 'Officer', 'Registrar', 'Faculty', 'force_renew_password']);
+    }
+
+    public function needRenewPassword(): bool
+    {
+        $plugin = RenewPasswordPlugin::get();
+
+        return
+            (
+                !is_null($plugin->getPasswordExpiresIn())
+                && Carbon::parse($this->{$plugin->getTimestampColumn()})->addDays($plugin->getPasswordExpiresIn()) < now()
+            ) || (
+                $plugin->getForceRenewPassword()
+                && $this->{$plugin->getForceRenewColumn()}
+            );
     }
 
     /**
