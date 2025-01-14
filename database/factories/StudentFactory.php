@@ -42,6 +42,7 @@ class StudentFactory extends Factory
             'address' => $this->faker->address(),
             //Philippine Number Regex
             'contact_number' => $this->faker->regexify('^9\d{9}$'),
+
         ];
     }
 }

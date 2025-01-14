@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('enrollment_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string('name');
-            $table->decimal('amount', 10, 2)->default(0);
-            $table->decimal('reference', 10, 2)->default(0);
-            $table->string('method')->default("GCash");
+            $table->string('method');
+            $table->string('image');
             $table->timestamps();
         });
     }
