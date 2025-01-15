@@ -55,7 +55,7 @@ class EnrollmentResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Student Information')
                     ->schema(static::getDetailsFormSchema()),
-                Forms\Components\Section::make('Course Advising')
+                Forms\Components\Section::make('Courses')
                     ->schema([static::getCourseRepeater()])
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Faculty', 'Registrar'])),
                 Forms\Components\Section::make('Fees')
@@ -161,9 +161,12 @@ class EnrollmentResource extends Resource
                     ->toggleable()
                     ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar'])),
                 Tables\Columns\ImageColumn::make('requirements')
-                    ->simpleLightbox(),
+                    ->simpleLightbox()
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer'])),
                 Tables\Columns\TextColumn::make('student_type')
-                    ->label('Student Type'),
+                    ->label('Student Type')
+                    ->hidden(fn () => !auth()->user()->hasRole(['Admin', 'Registrar', 'Officer', 'Faculty']))
+
 
 
             ])
