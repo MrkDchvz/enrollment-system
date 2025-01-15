@@ -257,20 +257,6 @@ class StudentResource extends Resource
                     ->required()
             ]),
 
-            Forms\Components\Grid::make(2)->schema([Forms\Components\TextInput::make('password')
-                ->label('Password')
-                ->maxLength(255)
-                ->password()
-                ->hiddenOn('edit')
-                ->required(),
-                Forms\Components\TextInput::make('password_confirmation')
-                    ->password()
-                    ->required()
-                    ->maxLength(255)
-                    ->same('password')
-                    ->label('Confirm Password')
-                    ->hiddenOn('edit')]),
-
             Forms\Components\TextInput::make('address')
                 ->placeholder('B9 L8 MANCHESTER ST. MOLINO 3, BACOOR CAVITE')
                 ->extraInputAttributes(['onInput' => 'this.value = this.value.toUpperCase()'])
