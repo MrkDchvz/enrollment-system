@@ -18,7 +18,6 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
-use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -47,10 +46,7 @@ class AppPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \EightyNine\Approvals\ApprovalPlugin::make(),
-                SimpleLightBoxPlugin::make(),
-                (new RenewPasswordPlugin())
-                    ->forceRenewPassword()
-                    ->timestampColumn(),
+                SimpleLightBoxPlugin::make()
             ])
             ->middleware([
                 EncryptCookies::class,
