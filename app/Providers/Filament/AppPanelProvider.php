@@ -49,8 +49,8 @@ class AppPanelProvider extends PanelProvider
                 \EightyNine\Approvals\ApprovalPlugin::make(),
                 SimpleLightBoxPlugin::make(),
                 (new RenewPasswordPlugin())
-                    ->forceRenewPassword()
-                    ->timestampColumn(),
+                    ->forceRenewPassword(),
+
             ])
             ->middleware([
                 EncryptCookies::class,

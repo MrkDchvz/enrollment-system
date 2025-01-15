@@ -48,7 +48,8 @@ class CreateEnrollment extends CreateRecord
         if (auth()->user()->HasRole('Student')) {
             $studentId = Student::where('user_id', $userId)->first()->id;
             $data['student_id'] = $studentId;
-            $onGoingEnrollment = Enrollment::where('student_id', $userId)
+
+            $onGoingEnrollment = Enrollment::where('student_id', $studentId)
                 ->where('school_year', $school_year)
                 ->where('semester', $semester)
                 ->whereHas('approvalStatus', function ($query) {

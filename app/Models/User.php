@@ -21,14 +21,8 @@ use Yebor974\Filament\RenewPassword\Traits\RenewPassword;
 
 class User extends Authenticatable implements FilamentUser, RenewPasswordContract
 {
-
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, SoftDeletes, RenewPassword;
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->hasRole(['Admin', 'Student', 'Officer', 'Registrar', 'Faculty', 'force_renew_password']);
-    }
 
     public function needRenewPassword(): bool
     {
@@ -42,6 +36,11 @@ class User extends Authenticatable implements FilamentUser, RenewPasswordContrac
                 $plugin->getForceRenewPassword()
                 && $this->{$plugin->getForceRenewColumn()}
             );
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->hasRole(['Admin', 'Student', 'Officer', 'Registrar', 'Faculty']);
     }
 
     /**

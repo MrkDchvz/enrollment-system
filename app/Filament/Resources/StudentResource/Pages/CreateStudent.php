@@ -16,7 +16,8 @@ class CreateStudent extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $password = $data['last_name'] . Carbon::now()->year;
+        $currentYear = Carbon::now()->year;
+        $password = $data['last_name'] . $currentYear;
         $user = User::create([
             'name' => trim(
                 "{$data['first_name']} " .
@@ -25,6 +26,7 @@ class CreateStudent extends CreateRecord
             'email' => $data['email'],
             'password' => Hash::make($password),
             ]);
+
         $user->assignRole('Student');
 
         $user->email_verified_at = Date::now();

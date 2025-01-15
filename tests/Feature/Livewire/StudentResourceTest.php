@@ -27,6 +27,22 @@ use function PHPUnit\Framework\assertEquals;
 beforeEach(function () {
     /* The TestCase setup generates a user before each test, so we need to clear the table to make sure we have a clean slate. */
     DB::table('users')->truncate();
+    Role::firstOrCreate(
+        ['name' => 'Student'],
+        ['guard_name' => 'web']
+    );
+    Role::firstOrCreate(
+        ['name' => 'Registrar'],
+        ['guard_name' => 'web']
+    );
+    Role::firstOrCreate(
+        ['name' => 'Officer'],
+        ['guard_name' => 'web']
+    );
+    Role::firstOrCreate(
+        ['name' => 'Faculty'],
+        ['guard_name' => 'web']
+    );
 });
 
 // Form Existence
@@ -115,8 +131,6 @@ it('can create a record', function () {
             // for testing purposes a custom email entered to avoid duplication
             'email' => 'testing@email.com',
             'address' => $record->address,
-            'password' => 'password',
-            'password_confirmation' => 'password',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -188,7 +202,7 @@ it('can validate required', function (string $column) {
         ->assertActionExists('create')
         ->call('create')
         ->assertHasFormErrors([$column => ['required']]);
-})->with(['student_number', 'first_name', 'last_name', 'email', 'gender' , 'contact_number', 'address', 'date_of_birth', 'password', 'password_confirmation']);
+})->with(['student_number', 'first_name', 'last_name', 'email', 'gender' , 'contact_number', 'address', 'date_of_birth']);
 
 // NOTE: Email has different way of validation refer to SPECIFIC SCENARIOS - EMAIL SECTION
 it('can validate unique', function (string $column) {
