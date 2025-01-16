@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -21,3 +22,7 @@ use Illuminate\Support\Facades\Route;
 //require __DIR__.'/auth.php';
 
 Route::get('pdf/{enrollment}', PdfController::class)->name('pdf');
+
+Route::get('/linkstorage', function () {
+    Artisan::call('storage:link');
+});
