@@ -14,10 +14,6 @@ return new class extends Migration
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('department_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('section_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('year_level', ["1st Year","2nd Year","3rd Year","4th Year"])->default("1st Year");
             $table->string('school_year')->default(static::getCurrentSchoolYear());
             $table->enum('registration_status', ['REGULAR', 'IRREGULAR'])->default("REGULAR");
