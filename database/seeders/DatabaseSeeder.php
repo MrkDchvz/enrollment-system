@@ -22,17 +22,12 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-
-
-
-
         $this->call([
             DepartmentSeeder::class,
             SectionSeeder::class,
             FeeSeeder::class,
             CourseSeeder::class,
             RoleSeeder::class,
-            StudentSeeder::class,
             InstructorSeeder::class,
             PopulatorSeeder::class,
         ]);
@@ -45,8 +40,8 @@ class DatabaseSeeder extends Seeder
             ->afterCreating(fn ($user) => $user->assignRole('Admin'))
             ->create([
                 'name' => 'admin',
-                'email' => 'admin@gmail.com',
-                'password' => Hash::make('admin')
+                'email' => 'cvsuadmin@gmail.com',
+                'password' => Hash::make('totallynotadmin')
             ]);
 
 
@@ -55,8 +50,8 @@ class DatabaseSeeder extends Seeder
             ->afterCreating(fn ($user) => $user->assignRole('Officer'))
             ->create([
                 'name' => 'officer',
-                'email' => 'officer@gmail.com',
-                'password' => Hash::make('officer')
+                'email' => 'cvsuofficer@gmail.com',
+                'password' => Hash::make('totallynotofficer')
             ]);
 
         // Create A Faculty Account
@@ -64,8 +59,8 @@ class DatabaseSeeder extends Seeder
             ->afterCreating(fn ($user) => $user->assignRole('Faculty'))
             ->create([
                 'name' => 'faculty',
-                'email' => 'faculty@gmail.com',
-                'password' => Hash::make('faculty')
+                'email' => 'cvsufaculty@gmail.com',
+                'password' => Hash::make('totallynotfaculty')
             ]);
 
 
@@ -74,8 +69,8 @@ class DatabaseSeeder extends Seeder
             ->afterCreating(fn ($user) => $user->assignRole('Registrar'))
             ->create([
                 'name' => 'registrar',
-                'email' => 'registrar@gmail.com',
-                'password' => Hash::make('registrar')
+                'email' => 'cvsuregistrar@gmail.com',
+                'password' => Hash::make('totallynotregistrar')
             ]);
 
 

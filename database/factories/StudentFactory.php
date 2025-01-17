@@ -26,7 +26,7 @@ class StudentFactory extends Factory
         $user = User::factory()->create([
             'name' => "{$firstName} {$middleName} {$lastName}",
             'email' => $email,
-            'password' => Hash::make('student'),
+            'password' => Hash::make('youaremyspecial'),
             'email_verified_at' => now(),
         ]);
 
