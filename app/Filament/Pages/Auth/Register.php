@@ -70,7 +70,6 @@ class Register extends BaseRegister
         $user->assignRole('Student');
         $student = Student::create([
             'user_id' => $user->id,
-            'student_number' => Str::random(6),
             'first_name' => $data['first_name'],
             'middle_name' => $data['middle_name'],
             'last_name' => $data['last_name'],

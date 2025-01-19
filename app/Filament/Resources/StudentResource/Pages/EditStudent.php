@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditStudent extends EditRecord
 {
@@ -19,18 +20,19 @@ class EditStudent extends EditRecord
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        $data['student_number'] = $this->record->student_number;
-        if (isset($data['email'])) {
-            $student = Student::where('student_number', $data['student_number'])->first();
-            if ($student->user) {
-                $student->email = $data['email'];
-            }
-            unset($data['email']);
+        if ($record->email !== $data['email']) {
+            $user = $record->user;
+            $user->email = $data['email'];
+            $user->save();
         }
+        unset($data['email']);
+
         $data['last_edited_by_id'] = auth()->id();
-        return $data;
+        $record->update($data);
+
+        return $record;
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

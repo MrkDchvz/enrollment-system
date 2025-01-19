@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->enum('year_level', ["1st Year","2nd Year","3rd Year","4th Year"])->default("1st Year");
             $table->string('school_year')->default(static::getCurrentSchoolYear());
-            $table->enum('registration_status', ['REGULAR', 'IRREGULAR'])->default("REGULAR");
+            $table->enum('registration_status', ['REGULAR', 'IRREGULAR'])->nullable();
             $table->enum('old_new_student',['Old Student', 'New Student'])->default("Old Student");
             $table->enum('semester', ['1st Semester', '2nd Semester'])->default(self::getCurrentSemester());
             $table->string('scholarship')->nullable();

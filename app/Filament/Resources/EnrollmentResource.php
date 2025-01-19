@@ -15,6 +15,7 @@ use App\Models\Enrollment;
 use App\Models\Fee;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\StudentNumberGenerator;
 use App\Models\User;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
@@ -211,6 +212,11 @@ class EnrollmentResource extends Resource
         if (auth()->user()->hasRole('Student')) {
             $student = Student::where('user_id', auth()->id())->firstOrFail();
             return parent::getEloquentQuery()->where('student_id', $student->id);
+        }
+        if (auth()->user()->hasRole(['Registrar', 'Faculty', 'Officer'])) {
+            return parent::getEloquentQuery()->whereHas('approvalStatus', function ($query) {
+                $query->whereIn('status', ['Approved', 'Created', 'Submitted']);
+            });
         } else {
             return parent::getEloquentQuery();
         }
@@ -274,6 +280,11 @@ class EnrollmentResource extends Resource
                     Livewire::make(ListEnrollmentFees::class, ['enrollmentId' => $enrollmentId])
                         ->columnSpanFull(),
                 ]),
+                TextEntry::make('comments')
+                    ->default(function ($record) {
+                        return $record->approvals->last()->comment;
+                    })
+                    ->label('Comments'),
             ]);
     }
 
@@ -297,84 +308,21 @@ class EnrollmentResource extends Resource
     public static function getDetailsFormSchema() : array {
         return [
             Forms\Components\Grid::make(2)->schema([
-                Forms\Components\Select::make('student_id')
-                    ->label('Student Number')
-                    ->searchable()
-                    ->getSearchResultsUsing(fn (string $search): array => Student::where('student_number', 'like', "%{$search}%")->limit(5)->pluck('student_number', 'id')->toArray())
-                    ->getOptionLabelUsing(fn ($value): ?string => Student::find($value)?->student_number)
-                    ->required()
-                    ->disabled(fn () => !auth()->user()->hasRole('Admin'))
-                    ->native(false)
-                    ->default(function() {
-                        // If the user that is logged in is a student then use that student's info if its admin let the admin select whom to enroll
+                Forms\Components\TextInput::make('student_number')
+                ->label('Student Number')
+                    ->default(function () {
+                        // If the user is student then set the user's student name  by default
                         if (auth()->user()->hasRole('Student')) {
                             $userId = auth()->id();
-                            $student = Student::where('user_id', $userId)->firstOrFail();
-                            return $student->id;
+                            return Student::where('user_id', $userId)->firstOrFail()->student_number;
                         }
                         else {
                             return null;
                         }
                     })
-                    ->reactive()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\get $get) {
-                        if($state) {
-                            // Default Values
-                            $currentSemester =  static::getCurrentSemester();
-                            $newYearLevel = "1st Year";
-                            // Initialize read-only fields
-                            $set('student_name', Student::class::find($state)->full_name ?? '');
-                            $set('semester', $currentSemester);
-
-                            // Retrieve the latest/last enrollment of the selected student
-                            $lastEnrollment = Student::class::find($state)->enrollments()->latest()->first();
-
-                            if ($lastEnrollment) {
-                                // This is used to calculate the newyearlevel ONLY
-                                $lastSemester = $lastEnrollment->semester;
-                                $lastYearLevel = $lastEnrollment->year_level;
-                                $lastDepartment = $lastEnrollment->section->department_id;
-                                $lastRegistrationStatus = $lastEnrollment->registration_status;
-                                $lastSectionId = $lastEnrollment->section_id;
-
-                                // If the last/latest enrollment is 2nd semester move the year level up by 1
-                                $newYearLevel = self::incrementYearLevel($lastYearLevel, $lastSemester);
-                                // Get new section
-                                $newSectionId = self::getNewSection($lastSectionId, $lastSemester);
-                                // Assign default year level based on latest enrollment data of student
-                                // Retains the year level if the last record is on 1st semester
-                                $set('registration_status', $lastRegistrationStatus);
-                                $set('old_new_student', 'Old Student');
-                                $set('department_id', $lastDepartment);
-                                $set('section_id', $newSectionId);
-                                // Autofill courses base on Department, Year_level, and semester
-                                $set('courseEnrollments', static::populateCourse(
-                                    $currentSemester,
-                                    $lastDepartment,
-                                    $newYearLevel
-                                ));
-                            }
-                            // Assumes that the student is a new first year student if last enrollment is not found
-                            // In other words if a student has no enrollment data the system will assume that the student is 1st year
-                            else {
-                                $set('old_new_student', 'New Student');
-                                $set('registration_status', 'REGULAR');
-                            }
-                            // Autofill fees base on year level
-                            $set('enrollmentFees', static::populateFees($newYearLevel));
-
-                        // clear fields if the student number is cleared
-                        } else {
-                            $set('student_name', '');
-                            $set('semester', '');
-                            $set('registration_status', '');
-                            $set('old_new_student', '');
-                            $set('section_id', null);
-
-                        }
-
-                    }),
+                ->live()
+                ->reactive()
+                ->disabled(),
                 Forms\Components\TextInput::make('student_name')
                     ->label('Student Name')
                     ->default(function () {
@@ -467,13 +415,9 @@ class EnrollmentResource extends Resource
                     ->required(),
 
 
-                Forms\Components\Select::make('old_new_student')
+                Forms\Components\TextInput::make('old_new_student')
                     ->label('Old/New Student')
-                    ->options([
-                        'Old Student' => 'Old Student',
-                        'New Student' => 'New Student',
-                    ])
-                    ->required(),
+                    ->readOnly(),
             ])
             ->hidden(fn() => auth()->user()->hasRole('Student')),
             Forms\Components\Select::make('user_id')
@@ -487,28 +431,50 @@ class EnrollmentResource extends Resource
 
             Forms\Components\ToggleButtons::make('student_type')
             ->label('Student Type')
-            ->options([
-                'Regular' => 'Regular',
-                'Irregular' => 'Irregular',
-                'Transferee' => 'Transferee',
-                'New' => 'New',
-            ])
+            ->options(function () {
+                if (auth()->user()->hasRole('Student')) {
+                    $loggedStudent = Student::where('user_id', auth()->user()->id)->firstOrFail();
+                    if (is_null($loggedStudent->student_number) || $loggedStudent->student_number === '') {
+                        return [
+                            'New' => 'New',
+                            'Transferee' => 'Transferee'
+                        ];
+                    } else {
+                        return [
+                            'Regular' => 'Regular',
+                            'Irregular' => 'Irregular',
+                        ];
+                    }
+                }
+                else {
+                    return [
+                        'New' => 'New',
+                        'Transferee' => 'Transferee',
+                         'Regular' => 'Regular',
+                        'Irregular' => 'Irregular',
+                    ];
+                }
+            })
             ->icons([
                     'Regular' => 'heroicon-o-check-circle',
                     'Irregular' => 'heroicon-o-arrow-path-rounded-square',
                     'Transferee' => 'heroicon-o-paper-airplane',
                     'New' => 'heroicon-o-sparkles',
                 ])
-            ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar', 'Student']))
             ->inline()
+            ->disabled(fn() => !auth()->user()->hasRole(['Student']))
             ->required(),
 
             Forms\Components\FileUpload::make('requirements')
             ->label('Requirements')
-            ->disk('public')
+            ->image()
+            ->imageEditor()
+            ->imagePreviewHeight('250')
             ->panelLayout('grid')
+            ->disk('public')
             ->directory('requirements')
             ->multiple()
+            ->disabled(fn () => !auth()->user()->hasRole('Student'))
             ->hidden(fn() => !auth()->user()->hasRole(['Admin', 'Registrar', 'Student']))
             ->required()
         ];

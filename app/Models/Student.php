@@ -50,8 +50,6 @@ class Student extends Model
 
 
 
-
-
     protected static function booted() : void {
         //    Soft Delete the user associated with the soft-deleted student.
         static::deleting(function($student) {

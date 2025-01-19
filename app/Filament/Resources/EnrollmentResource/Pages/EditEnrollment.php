@@ -9,10 +9,13 @@ use App\Models\EnrollmentFee;
 use App\Models\Fee;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\StudentNumberGenerator;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditEnrollment extends EditRecord
 {
@@ -31,8 +34,9 @@ class EditEnrollment extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array {
+    protected function handleRecordUpdate(Model $record , array $data): Model {
 //        dd(User::role('Registrar')->get());
+
 
         $section = Section::find($data['section_id']);
 
@@ -57,13 +61,47 @@ class EditEnrollment extends EditRecord
             }
         }
 
-        return $data;
+
+        if (auth()->user()->hasRole('Registrar')) {
+            $student = Student::find($record->student_id);
+            $generator = StudentNumberGenerator::where('school_year', static::getCurrentSchoolYear())->firstOrCreate();
+            if (!$student->student_number) {
+                $student->student_number = $generator->studentNumber;
+                $student->save();
+                $data['old_new_student'] = 'New Student';
+
+                $generator->iteration += 1;
+                $generator->save();
+            } else {
+                $data['old_new_student'] = 'Old Student';
+            }
+        }
+
+
+        $record->update($data);
+
+        return $record;
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $student = Student::find($data['student_id']);
+
+
         $data['student_name'] = $student->fullName;
+        if (auth()->user()->hasRole('Registrar')) {
+            if ($student->student_number) {
+                $data['student_number'] = $student->student_number;
+                $data['old_new_student'] = 'Old Student';
+            } else {
+                $data['student_number'] = StudentNumberGenerator::where('school_year', static::getCurrentSchoolYear())->firstOrCreate()->studentNumber;
+                $data['old_new_student'] = 'New Student';
+
+            }
+
+        }
+
+
 
         $courses = Course::selectRaw('id as course_id, course_name, lecture_units, lab_units, lecture_hours, lab_hours')
             ->whereHas('courseEnrollments', function ($query) use ($data)  {
@@ -73,7 +111,33 @@ class EditEnrollment extends EditRecord
             ->get()
             ->toArray();
 
+
         return $data;
+    }
+
+    public static function getCurrentSchoolYear() : string {
+        // Current Date
+        $date = Carbon::now();
+        // Current Year $ Month
+        $year = $date->year;
+        $month = $date->month;
+        // Set a new school year if the enrollment is in around august
+        // If the year is 2024 and the student enrolled around august 2024
+        // Then the school year will be 2024 - 2024
+        if ($month >= 8) {
+            $startYear = $date->year;
+            $endYear = $date->year + 1;
+        }
+        // Retain the current school year if the enrollment is around february
+        // If the year is 2024 and the student enrolled around february 2024
+        // Then the school year is 2023-2024
+        else {
+            $startYear = $date->year - 1;
+            $endYear = $date->year;
+        }
+        return trim(
+            sprintf('%s-%s', $startYear, $endYear)
+        );
     }
 
     public static function populateFees($year_level) {
