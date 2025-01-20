@@ -30,21 +30,6 @@ class CreateEnrollment extends CreateRecord
         $userId = auth()->id();
         $school_year = static::getCurrentSchoolYear();
         $semester = static::getCurrentSemester();
-        // Assign the current logged admin/registrar as encoder of the enrollment
-        if (auth()->user()->HasRole('Admin')) {
-
-            $data['user_id'] = $userId;
-
-            $section = Section::find($data['section_id']);
-
-            $departmentId = $section->department->id;
-            $year_level = $section->year_level;
-
-
-            $data['year_level'] = $year_level;
-            $data['department_id'] = $departmentId;
-        }
-
         if (auth()->user()->HasRole('Student')) {
             $studentId = Student::where('user_id', $userId)->first()->id;
             $data['student_id'] = $studentId;
